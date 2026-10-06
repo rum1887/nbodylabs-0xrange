@@ -148,3 +148,6 @@ the agent at it with `LEE_OPENAI_BASE_URL=http://host.docker.internal:11434/v1`.
 
 *Built as a security-education project. Nimbus and NBody Labs are fictional; the
 architecture mirrors common patterns in production account assistants.*
+*Open-source, run-it-locally practice targets for frontier security research.*
+
+---
