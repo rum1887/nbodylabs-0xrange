@@ -1,0 +1,71 @@
+name: lee-clone
+
+# ─────────────────────────────────────────────────────────────────────────
+#  Nimbus — a self-hosted account AI co-pilot.
+#
+#    lee      → the assistant: chat, approval gate, permissions, evals
+#    cf-mock  → a simulated platform API (the account plane it operates on)
+#    ollama   → local LLM runtime (no API key needed by default)
+#
+#  Everything is local by default: `docker compose up --build` and you are done.
+# ─────────────────────────────────────────────────────────────────────────
+
+services:
+  lee:
+    build: ./lee
+    container_name: lee-agent
+    ports:
+      - "${LEE_PORT:-8080}:8080"
+    environment:
+      LEE_MODEL: ${LEE_MODEL:-qwen3:4b}
+      LEE_OPENAI_BASE_URL: ${LEE_OPENAI_BASE_URL:-http://ollama:11434/v1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-ollama}
+      CF_API_URL: http://cf-mock:5000
+    volumes:
+      - lee_state:/data
+    depends_on:
+      cf-mock:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8080/api/status',timeout=3)"]
+      interval: 10s
+      timeout: 4s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  cf-mock:
+    build: ./cf-mock
+    container_name: lee-cf-mock
+    ports:
+      - "${CF_MOCK_PORT:-5050}:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:5000/admin/config',timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: lee-ollama
+    entrypoint: ["/bin/sh", "/scripts/entrypoint.sh"]
+    environment:
+      LEE_MODEL: ${LEE_MODEL:-qwen3:4b}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OLLAMA_KEEP_ALIVE: 24h
+    volumes:
+      - ollama_models:/root/.ollama
+      - ./ollama/entrypoint.sh:/scripts/entrypoint.sh:ro
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 120
+    restart: unless-stopped
+
+volumes:
+  ollama_models:
+  lee_state:

@@ -1,0 +1,7 @@
+.env
+__pycache__/
+*.pyc
+target/blogline.db
+lee/reports/*
+!lee/reports/.gitkeep
+.DS_Store

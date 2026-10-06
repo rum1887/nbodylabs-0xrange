@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nimbus — Account console</title>
+<link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+<body>
+
+<!-- ── icon set ─────────────────────────────────────────────────────── -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9.5 20v-5.5h5V20"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.6 2.4 14.4 0 17-2.4-2.6-2.4-14.4 0-17Z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 5.8v5.4c0 4.3 2.9 7.6 7 9.3 4.1-1.7 7-5 7-9.3V5.8Z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 13h4l1.5 2.5h5L16 13h4"/><path d="M4 13 6.4 5.4h11.2L20 13v5.6H4Z"/></symbol>
+  
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.5"/><path d="M11.5 12H21l-2 2.2M17.5 12v3"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M7 20v-6M12 20V7M17 20v-9"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="10" rx="2"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V6"/><path d="m6.5 11.5 5.5-5.5 5.5 5.5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5 13.7 9l5.5 1.7-5.5 1.7L12 18l-1.7-5.6-5.5-1.7L10.3 9Z"/><path d="M18.5 4v3M20 5.5h-3"/></symbol>
+  <symbol id="i-exp" viewBox="0 0 24 24"><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6"/></symbol>
+  <symbol id="i-col" viewBox="0 0 24 24"><path d="M9 4v5H4M15 20v-5h5M20 9h-5V4M4 15h5v5"/></symbol>
+  <symbol id="i-clear" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6.5 7l.8 12.1A2 2 0 0 0 9.3 21h5.4a2 2 0 0 0 2-1.9L17.5 7"/></symbol>
+</svg>
+
+<div class="app">
+
+  <!-- ══════════ NAV RAIL ══════════ -->
+  <aside class="rail">
+    <div class="rail-brand">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#0ea5e9"/>
+        </linearGradient></defs>
+          <path fill="url(#mg)" d="M16 3 3 9.2v13.6L16 29l13-6.2V9.2Z"/>
+          <path fill="#fff" fill-opacity=".92" d="m16 10.4 6.6 3.1-6.6 3.1-6.6-3.1Z"/>
+          <path fill="#fff" fill-opacity=".72" d="m9.4 13.5 6.6 3.1v5.2l-6.6-3.1Zm13.2 0-6.6 3.1v5.2l6.6-3.1Z"/>
+        </svg>
+      </span>
+      <span class="rail-org">
+        <b>NBody Labs</b>
+        <small>Pro plan</small>
+      </span>
+      <button class="icon-btn" title="Switch account"><svg><use href="#i-chev"/></svg></button>
+    </div>
+
+    <div class="rail-search">
+      <svg class="lead"><use href="#i-search"/></svg>
+      <input id="quick-search" placeholder="Quick search…" aria-label="Quick search">
+      <kbd>⌘K</kbd>
+    </div>
+
+    <nav class="rail-nav">
+      <div class="group">Overview</div>
+      <button class="tab active" data-tab="home"><svg><use href="#i-home"/></svg><span>Account home</span></button>
+      <button class="tab" data-tab="history"><svg><use href="#i-clock"/></svg><span>Conversations</span></button>
+
+      <div class="group">Operate</div>
+      <button class="tab" data-tab="approvals"><svg><use href="#i-inbox"/></svg><span>Approvals</span><span class="count" id="nav-approvals">0</span></button>
+
+      <div class="group">Govern</div>
+      <button class="tab" data-tab="access"><svg><use href="#i-key"/></svg><span>Access &amp; permissions</span></button>
+      <button class="tab" data-tab="evals"><svg><use href="#i-chart"/></svg><span>Quality &amp; evals</span></button>
+
+      <div class="group">Planned</div>
+      <button class="nav-item is-off"><svg><use href="#i-globe"/></svg><span>Domains</span><em>Soon</em></button>
+      <button class="nav-item is-off"><svg><use href="#i-lock"/></svg><span>Members</span><em>Soon</em></button>
+    </nav>
+
+    <div class="rail-foot">
+      <span class="pill" id="pill-model">model: …</span>
+      <span class="muted tiny">Nimbus console</span>
+    </div>
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <main class="main">
+    <header class="main-top">
+      <h1 class="crumb" id="crumb">Account home</h1>
+      <div class="main-actions">
+        <span class="pill" id="pill-account">…</span>
+        <span class="pill" id="pill-write">…</span>
+        <button class="btn-ask" id="ask-btn"><svg><use href="#i-spark"/></svg>Ask AI</button>
+      </div>
+    </header>
+
+    <div id="model-warning" class="banner" hidden>
+      <b>Preparing your assistant.</b> The model is still downloading
+      (<code>docker compose logs -f ollama</code>). The console is ready — chat unlocks as soon
+      as the model lands. One-time only.
+    </div>
+
+    <div class="panes">
+<!-- ── ACCOUNT HOME ── -->
+      <section class="pane active" id="tab-home">
+        <div class="hero">
+          <h2>What would you like to do today?</h2>
+          <p class="muted">Your assistant answers from live account data, runs diagnostics, and
+             proposes changes that always need your approval.</p>
+        </div>
+
+        <div class="hero-search">
+          <svg class="lead"><use href="#i-search"/></svg>
+          <input id="hero-input" placeholder="Ask anything about this account…" aria-label="Ask anything">
+          <kbd>⌘K</kbd>
+        </div>
+
+        <div class="tiles" id="home-stats"></div>
+
+        <div class="cols">
+          <div class="card-block">
+            <div class="block-head"><h3>Get started</h3></div>
+            <div class="tile-grid">
+              <button class="tile" data-q="Summarise my DNS records for example.com.">
+                <span class="tile-ic"><svg><use href="#i-globe"/></svg></span>
+                <b>Review your DNS</b>
+                <small>Summarise every record across your zones, and flag anything suspicious.</small>
+              </button>
+              <button class="tile" data-q="Check the TLS certificate for example.com.">
+                <span class="tile-ic"><svg><use href="#i-lock"/></svg></span>
+                <b>Run a security check</b>
+                <small>Inspect certificates, firewall rules and edge settings on your zones.</small>
+              </button>
+              <button class="tile" data-q="Enable Always Use HTTPS on example.com.">
+                <span class="tile-ic"><svg><use href="#i-shield"/></svg></span>
+                <b>Harden a zone</b>
+                <small>Propose a change — it stays pending until you approve it.</small>
+              </button>
+              <button class="tile" data-q="Show me a chart of traffic for example.com this week.">
+                <span class="tile-ic"><svg><use href="#i-chart"/></svg></span>
+                <b>Chart traffic</b>
+                <small>Render requests, errors and cache hit ratio as a chart card.</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-block">
+            <div class="block-head"><h3>Recent activity</h3>
+              <span class="muted tiny">last 10 events</span></div>
+            <ul class="activity" id="home-activity"><li class="muted small">Loading…</li></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── APPROVALS ── -->
+      <section class="pane" id="tab-approvals">
+        <h2>Approval centre</h2>
+        <p class="muted">Your assistant can only act through proposals. Nothing on this account
+           changes until you approve it.</p>
+        <div class="cols">
+          <div class="card-block">
+            <div class="block-head"><h3>Pending approvals</h3></div>
+            <div id="pending" class="side-list"><p class="muted small">Nothing waiting.</p></div>
+          </div>
+          <div class="card-block">
+            <div class="block-head"><h3>Applied changes</h3></div>
+            <div id="changes" class="side-list"><p class="muted small">No changes applied yet.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── ACCESS ── -->
+      <section class="pane" id="tab-access">
+        <h2>Choose what your assistant can access</h2>
+        <p class="muted">The assistant acts on this account with a scoped API token created on your
+           behalf. Full access never means unattended access: every write still needs approval.</p>
+
+        <div class="templates">
+          <label class="tpl"><input type="radio" name="tpl" value="full" checked>
+            <b>Full access</b><small>Read resources and propose changes.</small></label>
+          <label class="tpl"><input type="radio" name="tpl" value="read_only">
+            <b>Read only</b><small>Read and inspect. Cannot change anything.</small></label>
+          <label class="tpl"><input type="radio" name="tpl" value="custom">
+            <b>Custom</b><small>Choose individual permissions.</small></label>
+        </div>
+
+        <div id="perm-list" class="perm-list"></div>
+
+        <div class="card-block">
+          <div class="block-head"><h3>What the assistant can never change</h3></div>
+          <p class="muted small">Withheld no matter which template you pick or what you select
+             under Custom:</p>
+          <ul class="plain-list"><li>Account settings</li><li>Account membership</li>
+            <li>Billing</li><li>API tokens</li></ul>
+        </div>
+
+        <label class="switch"><input type="checkbox" id="write-lock">
+          <span><b>Write access disabled by an administrator</b>
+            <small class="muted">The account-admin kill switch. The assistant can still answer and
+              run diagnostics, but cannot create, update or delete anything.</small></span></label>
+
+        <div class="card-block">
+          <div class="block-head"><h3>Token the assistant holds</h3></div>
+          <p class="mono small" id="token-name">—</p>
+          <p class="muted small">Changing permissions creates a new token with the updated scope and
+             deletes the previous one. Changes apply to the next message.</p>
+        </div>
+      </section>
+
+      <!-- ── EVALS ── -->
+      <section class="pane" id="tab-evals">
+        <h2>Quality &amp; safety signals</h2>
+        <div class="tiles" id="statgrid"></div>
+        <div class="card-block">
+          <div class="block-head"><h3>Audit trail</h3><span class="muted tiny">last 25 events</span></div>
+          <table class="tbl" id="audit"><thead><tr><th>When</th><th>Event</th><th>Detail</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- ── HISTORY ── -->
+      <section class="pane" id="tab-history">
+        <h2>Conversations</h2>
+        <p class="muted small">History is stored locally. Dismissing the assistant panel never
+           deletes it.</p>
+        <div class="card-block">
+          <table class="tbl" id="convos"><thead><tr><th>Title</th><th>Created</th><th>Updated</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+    </div>
+  </main>
+<!-- ══════════ ASSISTANT DRAWER ══════════ -->
+  <aside class="drawer" id="drawer">
+    <div class="drawer-resize" id="drawer-resize" role="separator" aria-orientation="vertical"
+         aria-label="Resize assistant" tabindex="0" title="Drag to resize · double-click to reset"></div>
+    <header class="drawer-top">
+      <button class="drawer-title" id="drawer-title">New conversation <svg><use href="#i-chev"/></svg></button>
+      <div class="drawer-icons">
+        <button class="icon-btn" id="drawer-expand" title="Expand assistant"><svg><use href="#i-exp"/></svg></button>
+        <button class="icon-btn" id="drawer-refresh" title="Clear conversation"><svg><use href="#i-clear"/></svg></button>
+        <button class="icon-btn" id="drawer-close" title="Close assistant"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+    </header>
+
+    <div class="chat" id="chat">
+      <div class="chat-empty" id="chat-empty">
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 160 96">
+            <defs>
+              <radialGradient id="g1" cx="35%" cy="40%" r="70%">
+                <stop offset="0" stop-color="#c7d2fe"/><stop offset="1" stop-color="#e0e7ff" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="g2" cx="60%" cy="55%" r="65%">
+                <stop offset="0" stop-color="#bae6fd"/><stop offset="1" stop-color="#e0f2fe" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="60" cy="48" r="44" fill="url(#g1)"/>
+            <circle cx="96" cy="56" r="38" fill="url(#g2)"/>
+            <circle cx="82" cy="42" r="22" fill="#fff" fill-opacity=".75"/>
+          </svg>
+        </div>
+        <h3 id="greeting">Good to see you.</h3>
+        <p class="muted">What are we doing today?</p>
+        <div class="suggest-list">
+          <button class="chip" data-q="Summarise my DNS records for example.com.">
+            <svg class="ci"><use href="#i-globe"/></svg>
+            <span><b>DNS overview</b><small>What records exist on example.com?</small></span></button>
+          <button class="chip" data-q="Show me a chart of traffic for example.com this week.">
+            <svg class="ci"><use href="#i-chart"/></svg>
+            <span><b>Traffic this week</b><small>Requests, errors and cache hit ratio</small></span></button>
+          <button class="chip" data-q="Check the TLS certificate for example.com.">
+            <svg class="ci"><use href="#i-lock"/></svg>
+            <span><b>Certificate check</b><small>Is the edge certificate healthy?</small></span></button>
+          <button class="chip" data-q="Enable Always Use HTTPS on example.com.">
+            <svg class="ci"><use href="#i-shield"/></svg>
+            <span><b>Propose a change</b><small>Harden a zone — approval required</small></span></button>
+          <button class="chip" data-q="Which dashboard page do I use to edit firewall rules?">
+            <svg class="ci"><use href="#i-inbox"/></svg>
+            <span><b>Where do I go?</b><small>Find the right page for a task</small></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-foot">
+      <label class="hierarchy" title="Treats tool output as data, never as instructions">
+        <input type="checkbox" id="hierarchy" checked><span>Instruction hierarchy</span>
+      </label>
+      <div class="composer">
+        <textarea id="input" rows="1" placeholder="Ask about this account…"></textarea>
+        <div class="composer-bar">
+          <span class="chip-inline"><svg><use href="#i-spark"/></svg>Ask</span>
+          <button id="send" class="send-btn" title="Send"><svg><use href="#i-send"/></svg></button>
+        </div>
+      </div>
+      <p class="fineprint">Assistant output can be wrong. Every change requires your explicit
+         approval before anything is applied.</p>
+    </div>
+  </aside>
+</div>
+<script src="{{ url_for('static', path='app.js') }}"></script>
+</body>
+</html>
