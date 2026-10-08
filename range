@@ -3,6 +3,7 @@
 #  🛰️  NBody Labs Security Range CLI
 #
 #  Usage:
+#    ./range setup                Pre-flight environment check (Challenge 0x00)
 #    ./range up [challenge_id]    Spin up a challenge (e.g. 0x01, 0x02; default: 0x01)
 #    ./range down                 Stop and remove all running containers
 #    ./range list                 List available challenges
@@ -64,10 +65,57 @@ cmd_list() {
     echo "============================================================"
 }
 
+cmd_setup() {
+    echo "============================================================"
+    echo "  🛰️  NBody Labs Range :: 0x00 Environment Pre-flight"
+    echo "============================================================"
+    echo "[*] Checking Git..."
+    if command -v git >/dev/null 2>&1; then
+        echo "  [✓] Git is installed."
+    else
+        echo "  [✗] Git not found."
+    fi
+
+    echo "[*] Checking Docker..."
+    if command -v docker >/dev/null 2>&1; then
+        echo "  [✓] Docker CLI is installed."
+        if docker info >/dev/null 2>&1; then
+            echo "  [✓] Docker daemon is running."
+        else
+            echo "  [!] Docker daemon is not running. Please start Docker Desktop/daemon."
+        fi
+    else
+        echo "  [✗] Docker CLI not found. Please install Docker & Docker Compose."
+    fi
+
+    echo "[*] Checking Range Environment (.env)..."
+    if [ -f "${ROOT_DIR}/.env" ]; then
+        echo "  [✓] .env file detected."
+        local model
+        model="$(grep '^NBODY_MODEL=' "${ROOT_DIR}/.env" 2>/dev/null | cut -d'=' -f2 || echo "default")"
+        echo "      Active Model: ${model}"
+    else
+        echo "  [i] No .env file found (using defaults from .env.example)."
+        echo "      Run 'cp .env.example .env' to customize hosted LLM endpoints."
+    fi
+
+    echo ""
+    echo "============================================================"
+    echo "  [+] Pre-flight check complete!"
+    echo "  Ready to launch Challenge 0x01:"
+    echo "    ./range up 0x01"
+    echo "============================================================"
+}
+
 cmd_up() {
     local raw_id="${1:-0x01}"
     local id
     id="$(normalize_id "$raw_id")"
+
+    if [ "$id" = "00" ] || [ "$id" = "0x00" ]; then
+        cmd_setup
+        return 0
+    fi
 
     local cdir
     if ! cdir="$(find_challenge_dir "$id")"; then
@@ -156,8 +204,11 @@ case "$COMMAND" in
     reset|restart)
         cmd_reset "${1:-0x01}"
         ;;
+    setup|check|preflight)
+        cmd_setup
+        ;;
     help|--help|-h)
-        echo "Usage: ./range [up|down|list|status|reset] [challenge_id]"
+        echo "Usage: ./range [setup|up|down|list|status|reset] [challenge_id]"
         ;;
     *)
         # If user runs `./range 0x01` or `./range 01` directly

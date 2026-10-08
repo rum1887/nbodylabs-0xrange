@@ -10,7 +10,7 @@ NBody Labs is an independent venture dedicated to building the next generation o
 
 ## 🚀 Quick Start
 
-### 1. Clone & Setup
+### 0x00. Clone & Setup
 ```bash
 # Clone the lab repository
 git clone https://github.com/rum1887/nbodylabs-0xrange.git
@@ -18,9 +18,12 @@ cd nbodylabs-0xrange
 
 # (Optional) Copy example environment configuration
 cp .env.example .env
+
+# Verify environment pre-flight
+./range setup
 ```
 
-### 2. Launch Challenge 0x01
+### 0x01. Launch Challenge 0x01
 ```bash
 # Spin up Challenge 0x01 with a single command
 ./range up 0x01
@@ -56,8 +59,9 @@ NBODY_MODEL=gpt-4o-mini
 
 ## 🎯 Security Challenges
 
-| ID | Challenge | Target | Attack Surface | Guide |
+| ID | Challenge | Target | Attack Surface / Focus | Guide |
 |:---|:---|:---|:---|:---|
+| **0x00** | Environment Setup & Pre-flight | Local / Hosted LLM | Docker pre-flight, model latency & tool reliability | [0x00 Setup Guide](challenges/00-setup/README.md) |
 | **0x01** | Goal Hijacking against Orbit | Orbit Co-pilot (v1.0) | Indirect Prompt Injection, Secondary Objectives, Tool Coercion | [Challenge 0x01 Guide](challenges/01-goal-hijacking/README.md) |
 
 To launch Challenge 0x01:
@@ -117,6 +121,9 @@ An automated AI Triage Bot evaluates your report against the **25-point NBody La
 The range provides a centralized CLI to spin up, manage, and tear down challenges:
 
 ```bash
+# Pre-flight environment check (Challenge 0x00)
+./range setup
+
 # List all available challenges and active Orbit versions
 ./range list
 
@@ -141,6 +148,9 @@ Each challenge is housed under the `challenges/` directory with its own environm
 
 ```
 challenges/
+├── 00-setup/
+│   ├── README.md                   # Environment setup & model pre-flight
+│   └── config.env                  # Challenge 0x00 metadata & env
 ├── 01-goal-hijacking/
 │   ├── README.md                   # Scenario, scope & submission guide
 │   └── config.env                  # Challenge 0x01: Orbit v1 baseline

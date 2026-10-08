@@ -7,6 +7,9 @@ This directory contains configuration profiles for each security lab in the NBod
 ```
 nbodylabs-0xrange/
 ├── challenges/
+│   ├── 00-setup/
+│   │   ├── README.md                   # Environment setup & model pre-flight
+│   │   └── config.env                  # Challenge 0x00 metadata & env
 │   ├── 01-goal-hijacking/
 │   │   ├── README.md                   # Scenario briefing, rules & report guide
 │   │   └── config.env                  # Challenge 0x01 metadata & env
@@ -80,6 +83,11 @@ The `./range up 0x02` runner automatically detects and applies `docker-compose.o
 ---
 
 ## Running Challenges with a Single Command
+
+* **Pre-flight environment check (0x00):**
+  ```bash
+  ./range setup
+  ```
 
 * **List all challenges:**
   ```bash
