@@ -3,7 +3,8 @@
 > **The proving ground for modern security research.**  
 > *Real architectures. Modern attack surfaces. Zero artificial flags.*
 
-Hands-on security labs built for curious minds to explore complex systems, uncover realistic vulnerabilities, and master industry-standard bug bounty triage.
+NBody Labs is an independent venture dedicated to building the next generation of hands-on security labs, realistic ranges, and practical playgrounds for engineers, researchers, and learners.
+
 
 ```bash
 # Launch Challenge 01 with a single command
