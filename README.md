@@ -50,7 +50,50 @@ To launch Challenge 01:
 ./range up 01
 ```
 
-*See the [Challenge 01 Guide](challenges/01-goal-hijacking/README.md) for target scenario details, rules of engagement, and bug bounty submission instructions.*
+*See the [Challenge 01 Guide](challenges/01-goal-hijacking/README.md) for target scenario details, asset boundaries, and exploration hints.*
+
+---
+
+## 📋 Program Rules of Engagement
+
+The NBody Labs Range models realistic production cloud infrastructure. To keep testing safe and focused, participants must adhere to the following scope boundaries:
+
+| In-Scope | Out-of-Scope |
+|---|---|
+| • Direct & Indirect Prompt Injection | • Network Denial of Service (DoS/DDoS) |
+| • Goal Hijacking & Objective Displacement | • Brute-forcing host infrastructure ports |
+| • Privilege Escalation via Agent Tool Calling | • Host breakouts / escaping Docker containers |
+| • Sensitive Credential & Secret Exfiltration | • Modifying local testbed code directly |
+| • Bypassing or socially engineering human approval gates | |
+
+---
+
+## 🏆 Submission & Triage Workflow (Pull Request Review Bot)
+
+This lab operates with **zero artificial CTF flags or synthetic strings**. Findings are submitted and reviewed just like a professional bug bounty submission:
+
+### 1. Write Your Bug Bounty Report
+Follow standard security disclosure formatting:
+* **Vulnerability Title & Classification:** Standard taxonomy (e.g. CWE-1427, OWASP Top 10 for LLM: LLM01).
+* **Severity Assessment:** CVSS v3.1 vector or P1–P4 severity rating with tangible business impact.
+* **Empirical Reproduction Steps:** Exact prompt sequence, model configuration, and empirical success rate measured over $N$ trials.
+* **Proof of Impact & Forensic Evidence:** Clear separation of:
+  - **REACHED**: Untrusted payload successfully ingested into model context.
+  - **HIJACKED**: Agent deviated from intended objective or executed rogue instructions.
+  - **LEAKED / MUTATED**: Impact materialized in the platform backend or stopped by security boundaries (with audit log excerpts).
+* **Root Cause & Architectural Remediation:** Concrete defensive fixes (context delimiters, policy boundaries, least privilege).
+
+### 2. Submit as a Pull Request
+1. Fork the submission repository: [`nbody-labs-x-range-submissions`](https://github.com/rum1887/nbody-labs-x-range-submissions)
+2. Add your report under the target challenge directory:
+   ```
+   submissions/<challenge-id>/<your-handle>-report.md
+   ```
+   *(e.g., `submissions/challenge-01/alice-report.md`)*
+3. Open a Pull Request against `main`.
+
+### 3. Automated AI Triage Bot Review
+An automated AI Triage Bot evaluates your report against the **25-point NBody Labs triage rubric** (scoring taxonomy, reproducibility, output separation, threat modeling, and remediation). The bot comments directly on your PR with a structured score, detailed critique, and actionable feedback.
 
 ---
 
