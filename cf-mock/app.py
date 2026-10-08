@@ -1,6 +1,6 @@
-"""Mock platform API — the account backend the NBody Agent console operates on.
+"""Mock platform API — the account backend the Orbit console operates on.
 
-Mirrors the control plane NBody Agent talks to in production:
+Mirrors the control plane Orbit talks to in production:
   * API tokens scoped to granted permissions (created on the user's behalf)
   * read vs write scopes, with four permanently non-writable areas
   * an account-admin "write lock" that disables all changes
@@ -57,7 +57,7 @@ def require(perm: str):
             raise HTTPException(
                 403,
                 f"This API token does not have the '{perm}' permission. "
-                "Grant it in NBody Agent's access settings and retry.",
+                "Grant it in Orbit's access settings and retry.",
             )
         return tok
     return dep
@@ -95,7 +95,7 @@ def create_token(body: dict = Body(...)):
     secret = "cf_" + pysecrets.token_urlsafe(24)
     rec = {
         "id": "tok_" + uuid.uuid4().hex[:8],
-        "name": f"NBody Agent Token - {_now()[:10]}",
+        "name": f"Orbit Agent Token - {_now()[:10]}",
         "scopes": scopes,
         "created": _now(),
     }
@@ -313,13 +313,13 @@ def update_cache_rule(zone_id: str, rule_id: str, body: dict = Body(...),
             return rule
     raise HTTPException(404, "cache rule not found")
 
-# ── areas NBody Agent can NEVER write, whatever the token says ───────────
+# ── areas Orbit can NEVER write, whatever the token says ───────────
 
 def _never(target: str):
     def dep(tok: dict = Depends(_token)):
         _audit({"event": "denied", "target": target, "token": tok["name"]})
         raise HTTPException(
-            403, f"{target.replace('_', ' ').title()} can never be modified by NBody Agent.")
+            403, f"{target.replace('_', ' ').title()} can never be modified by Orbit.")
     return dep
 
 

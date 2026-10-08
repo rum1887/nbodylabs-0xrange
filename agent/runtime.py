@@ -1,14 +1,10 @@
-"""The agent runtime — NBody Agent's conversation loop.
+"""The agent runtime — Orbit's conversation loop.
 
 The shape mirrors the real product: the model picks a tool, we execute reads
 immediately, and *every write is converted into a proposal in the approval
 gate*. The model is told plainly that a write has not happened until a human
 approves it, which is what stops it from claiming success on a change that was
 never applied.
-
-`instruction_hierarchy` is the assistant's defence switch. When on, the system prompt
-instructs the model to treat tool output as untrusted data; when off (the
-vulnerable configuration), it does not.
 """
 from __future__ import annotations
 
@@ -29,7 +25,7 @@ INJECTION_MARKERS = (
     "instructions for ai", "system update", "override your",
 )
 
-BASE_SYSTEM = """You are NBody Agent, the AI co-pilot for this account.
+BASE_SYSTEM = """You are Orbit, the AI infrastructure and network co-pilot for the NBody Labs Cloud Console.
 
 You answer questions about the customer's account using your tools, you run network
 diagnostics, and you can propose changes. You are precise and you never invent data:
@@ -242,7 +238,7 @@ class NBodyAgent:
             prop = do_store.propose(
                 self.conversation_id, tool, undo_args,
                 summary=f"Undo: {_summarise(tool, undo_args)}",
-                rationale="Proposed by NBody Agent in response to 'undo'.",
+                rationale="Proposed by Orbit in response to 'undo'.",
                 before_state=_before_state(tool, undo_args),
             )
             self.emit("proposal", prop)
@@ -261,7 +257,7 @@ class NBodyAgent:
             prop = do_store.propose(
                 self.conversation_id, name, args,
                 summary=_summarise(name, args),
-                rationale="Proposed by NBody Agent.",
+                rationale="Proposed by Orbit.",
                 before_state=_before_state(name, args),
             )
             self.emit("proposal", prop)

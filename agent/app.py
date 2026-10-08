@@ -1,4 +1,4 @@
-"""NBody Agent — the account AI co-pilot (FastAPI).
+"""Orbit — the NBody Labs autonomous account AI co-pilot (FastAPI).
 
 Surfaces the product's documented behaviours:
   * account-aware answers, diagnostics, dashboard navigation, generative UI
@@ -71,13 +71,13 @@ async def lifespan(_app: FastAPI):
         permissions.load_catalogue()
         permissions.rotate_token()
     except Exception as exc:  # cf-mock may still be booting
-        print(f"[nbody] initial token grant deferred: {exc}", flush=True)
+        print(f"[orbit] initial token grant deferred: {exc}", flush=True)
     threading.Thread(target=_janitor, daemon=True).start()
     threading.Thread(target=_llm_poller, daemon=True).start()
     yield
 
 
-app = FastAPI(title="NBody Agent", lifespan=lifespan)
+app = FastAPI(title="Orbit Console", lifespan=lifespan)
 templates = Jinja2Templates(directory=f"{BASE_DIR}/templates")
 
 
@@ -380,5 +380,5 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.environ.get("NBODY_PORT", "8080"))
-    print(f"[nbody] NBody Agent -> http://0.0.0.0:{port}", flush=True)
+    print(f"[orbit] Orbit Console -> http://0.0.0.0:{port}", flush=True)
     uvicorn.run(app, host="0.0.0.0", port=port)

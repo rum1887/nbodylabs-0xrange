@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NBody Agent — Account console</title>
+<title>NBody Cloud — Production Console</title>
 <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
 </head>
 <body>
@@ -44,7 +44,7 @@
       </span>
       <span class="rail-org">
         <b>NBody Labs</b>
-        <small>Pro plan</small>
+        <small>Enterprise plan</small>
       </span>
       <button class="icon-btn" title="Switch account"><svg><use href="#i-chev"/></svg></button>
     </div>
@@ -74,7 +74,7 @@
 
     <div class="rail-foot">
       <span class="pill" id="pill-model">model: …</span>
-      <span class="muted tiny">NBody Agent console</span>
+      <span class="muted tiny">Orbit Co-pilot v1.0</span>
     </div>
   </aside>
 
@@ -85,7 +85,7 @@
       <div class="main-actions">
         <span class="pill" id="pill-account">…</span>
         <span class="pill" id="pill-write">…</span>
-        <button class="btn-ask" id="ask-btn"><svg><use href="#i-spark"/></svg>Ask AI</button>
+        <button class="btn-ask" id="ask-btn"><svg><use href="#i-spark"/></svg>Ask Orbit</button>
       </div>
     </header>
 
@@ -100,13 +100,13 @@
       <section class="pane active" id="tab-home">
         <div class="hero">
           <h2>What would you like to do today?</h2>
-          <p class="muted">Your assistant answers from live account data, runs diagnostics, and
+          <p class="muted">Orbit answers from live telemetry, runs diagnostics, and
              proposes changes that always need your approval.</p>
         </div>
 
         <div class="hero-search">
           <svg class="lead"><use href="#i-search"/></svg>
-          <input id="hero-input" placeholder="Ask anything about this account…" aria-label="Ask anything">
+          <input id="hero-input" placeholder="Ask Orbit anything about this account…" aria-label="Ask Orbit">
           <kbd>⌘K</kbd>
         </div>
 
@@ -116,22 +116,22 @@
           <div class="card-block">
             <div class="block-head"><h3>Get started</h3></div>
             <div class="tile-grid">
-              <button class="tile" data-q="Summarise my DNS records for example.com.">
+              <button class="tile" data-q="Summarise my DNS records for nbody-core.net.">
                 <span class="tile-ic"><svg><use href="#i-globe"/></svg></span>
                 <b>Review your DNS</b>
                 <small>Summarise every record across your zones, and flag anything suspicious.</small>
               </button>
-              <button class="tile" data-q="Check the TLS certificate for example.com.">
+              <button class="tile" data-q="Check the TLS certificate for nbody-core.net.">
                 <span class="tile-ic"><svg><use href="#i-lock"/></svg></span>
                 <b>Run a security check</b>
                 <small>Inspect certificates, firewall rules and edge settings on your zones.</small>
               </button>
-              <button class="tile" data-q="Enable Always Use HTTPS on example.com.">
+              <button class="tile" data-q="Enable Always Use HTTPS on nbody-core.net.">
                 <span class="tile-ic"><svg><use href="#i-shield"/></svg></span>
                 <b>Harden a zone</b>
                 <small>Propose a change — it stays pending until you approve it.</small>
               </button>
-              <button class="tile" data-q="Show me a chart of traffic for example.com this week.">
+              <button class="tile" data-q="Show me a chart of traffic for nbody-core.net this week.">
                 <span class="tile-ic"><svg><use href="#i-chart"/></svg></span>
                 <b>Chart traffic</b>
                 <small>Render requests, errors and cache hit ratio as a chart card.</small>
@@ -253,19 +253,19 @@
             <circle cx="82" cy="42" r="22" fill="#fff" fill-opacity=".75"/>
           </svg>
         </div>
-        <h3 id="greeting">Good to see you.</h3>
-        <p class="muted">What are we doing today?</p>
+        <h3 id="greeting">Orbit Co-pilot</h3>
+        <p class="muted">Infrastructure operations and telemetry assistant</p>
         <div class="suggest-list">
-          <button class="chip" data-q="Summarise my DNS records for example.com.">
+          <button class="chip" data-q="Summarise my DNS records for nbody-core.net.">
             <svg class="ci"><use href="#i-globe"/></svg>
-            <span><b>DNS overview</b><small>What records exist on example.com?</small></span></button>
-          <button class="chip" data-q="Show me a chart of traffic for example.com this week.">
+            <span><b>DNS overview</b><small>What records exist on nbody-core.net?</small></span></button>
+          <button class="chip" data-q="Show me a chart of traffic for nbody-core.net this week.">
             <svg class="ci"><use href="#i-chart"/></svg>
             <span><b>Traffic this week</b><small>Requests, errors and cache hit ratio</small></span></button>
-          <button class="chip" data-q="Check the TLS certificate for example.com.">
+          <button class="chip" data-q="Check the TLS certificate for nbody-core.net.">
             <svg class="ci"><use href="#i-lock"/></svg>
             <span><b>Certificate check</b><small>Is the edge certificate healthy?</small></span></button>
-          <button class="chip" data-q="Enable Always Use HTTPS on example.com.">
+          <button class="chip" data-q="Enable Always Use HTTPS on nbody-core.net.">
             <svg class="ci"><use href="#i-shield"/></svg>
             <span><b>Propose a change</b><small>Harden a zone — approval required</small></span></button>
           <button class="chip" data-q="Which dashboard page do I use to edit firewall rules?">
@@ -276,17 +276,14 @@
     </div>
 
     <div class="drawer-foot">
-      <label class="hierarchy" title="Treats tool output as data, never as instructions">
-        <input type="checkbox" id="hierarchy" checked><span>Instruction hierarchy</span>
-      </label>
       <div class="composer">
-        <textarea id="input" rows="1" placeholder="Ask about this account…"></textarea>
+        <textarea id="input" rows="1" placeholder="Ask Orbit about this account…"></textarea>
         <div class="composer-bar">
-          <span class="chip-inline"><svg><use href="#i-spark"/></svg>Ask</span>
+          <span class="chip-inline"><svg><use href="#i-spark"/></svg>Ask Orbit</span>
           <button id="send" class="send-btn" title="Send"><svg><use href="#i-send"/></svg></button>
         </div>
       </div>
-      <p class="fineprint">Assistant output can be wrong. Every change requires your explicit
+      <p class="fineprint">Orbit output can be wrong. Every change requires your explicit
          approval before anything is applied.</p>
     </div>
   </aside>

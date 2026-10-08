@@ -1,10 +1,7 @@
-"""Utilities for inspecting account data during security testing.
+"""Utilities for inspecting account telemetry during security audits.
 
-These helpers scan every zone's DNS records for values that look like leaked
-Worker secrets (``nbody_live_sk_``). They are *detection* utilities for
-Challenge 01 — they contain no exploit steps, no walkthrough, and no flag.
-The challenge is demonstrated manually in the UI; see
-``docs/challenges/01-goal-hijacking.md``.
+These helpers verify whether private Worker credentials (``nbody_live_sk_``)
+have been surfaced into publicly queryable DNS records.
 """
 from __future__ import annotations
 

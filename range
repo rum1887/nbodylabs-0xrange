@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+# ==============================================================================
+#  🛰️  NBody Labs Frontier Red-Teaming Range CLI
+#
+#  Usage:
+#    ./range up [challenge_id]    Spin up a challenge (e.g. 01, 02; default: 01)
+#    ./range down                 Stop and remove all running containers
+#    ./range list                 List available challenges
+#    ./range status               Show status of containers and active challenge
+#    ./range reset [challenge_id] Wipe state and restart fresh
+# ==============================================================================
+
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CHALLENGES_DIR="${ROOT_DIR}/challenges"
+
+normalize_id() {
+    local raw="${1:-01}"
+    if [[ "$raw" =~ ^[0-9]$ ]]; then
+        printf "%02d" "$raw"
+    else
+        printf "%s" "$raw"
+    fi
+}
+
+find_challenge_dir() {
+    local id="$1"
+    for dir in "${CHALLENGES_DIR}/${id}"*; do
+        if [ -d "$dir" ]; then
+            echo "$dir"
+            return 0
+        fi
+    done
+    return 1
+}
+
+cmd_list() {
+    echo "============================================================"
+    echo "  🛰️  Available NBody Labs Challenges"
+    echo "============================================================"
+    if [ ! -d "$CHALLENGES_DIR" ]; then
+        echo "  No challenges found in ${CHALLENGES_DIR}."
+        return
+    fi
+
+    for dir in "$CHALLENGES_DIR"/*; do
+        if [ -d "$dir" ]; then
+            local base
+            base="$(basename "$dir")"
+            local conf="${dir}/config.env"
+            local name="$base"
+            local version="v1"
+            if [ -f "$conf" ]; then
+                # shellcheck source=/dev/null
+                name="$(grep '^CHALLENGE_NAME=' "$conf" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "$base")"
+                version="$(grep '^ORBIT_VERSION=' "$conf" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "v1")"
+            fi
+            printf "  • %-24s -> %s (Orbit %s)\n" "$base" "$name" "$version"
+        fi
+    done
+    echo "============================================================"
+}
+
+cmd_up() {
+    local raw_id="${1:-01}"
+    local id
+    id="$(normalize_id "$raw_id")"
+
+    local cdir
+    if ! cdir="$(find_challenge_dir "$id")"; then
+        echo "[-] Error: Challenge '${raw_id}' (normalized: '${id}') not found in ${CHALLENGES_DIR}."
+        echo "    Run './range list' to see available challenges."
+        exit 1
+    fi
+
+    local cname
+    cname="$(basename "$cdir")"
+    local conf="${cdir}/config.env"
+
+    echo "[*] Initializing ${cname}..."
+
+    # Export configs from challenge env file if present
+    if [ -f "$conf" ]; then
+        set -a
+        # shellcheck source=/dev/null
+        source "$conf"
+        set +a
+    else
+        export CHALLENGE_ID="$id"
+        export ORBIT_VERSION="v1"
+    fi
+
+    # Build compose command
+    local compose_args=("-f" "${ROOT_DIR}/docker-compose.yml")
+    if [ -f "${cdir}/docker-compose.override.yml" ]; then
+        compose_args+=("-f" "${cdir}/docker-compose.override.yml")
+    fi
+
+    echo "[*] Building and spinning up containers..."
+    docker compose "${compose_args[@]}" up --build -d
+
+    local port="${NBODY_PORT:-8080}"
+    local mock_port="${CF_MOCK_PORT:-5050}"
+    local orbit_ver="${ORBIT_VERSION:-v1}"
+
+    echo ""
+    echo "============================================================"
+    echo "  🛰️  NBody Labs Range :: ${cname}"
+    echo "============================================================"
+    echo "  Console:      http://localhost:${port}"
+    echo "  Account API:  http://localhost:${mock_port}"
+    echo "  Target:       Orbit Infrastructure Co-pilot (${orbit_ver})"
+    echo ""
+    echo "  Scope & Details: See README.md"
+    echo "  To stop:         ./range down"
+    echo "============================================================"
+}
+
+cmd_down() {
+    echo "[*] Stopping NBody Labs Range containers..."
+    docker compose -f "${ROOT_DIR}/docker-compose.yml" down -v
+    echo "[+] Range environment stopped and state cleaned."
+}
+
+cmd_status() {
+    docker compose -f "${ROOT_DIR}/docker-compose.yml" ps
+}
+
+cmd_reset() {
+    local id="${1:-01}"
+    echo "[*] Resetting Challenge ${id}..."
+    cmd_down
+    cmd_up "$id"
+}
+
+# Main command router
+COMMAND="${1:-up}"
+shift || true
+
+case "$COMMAND" in
+    up)
+        cmd_up "${1:-01}"
+        ;;
+    down|stop)
+        cmd_down
+        ;;
+    list|ls)
+        cmd_list
+        ;;
+    status|ps)
+        cmd_status
+        ;;
+    reset|restart)
+        cmd_reset "${1:-01}"
+        ;;
+    help|--help|-h)
+        echo "Usage: ./range [up|down|list|status|reset] [challenge_id]"
+        ;;
+    *)
+        # If user runs `./range 01` directly
+        if [[ "$COMMAND" =~ ^[0-9]+$ ]]; then
+            cmd_up "$COMMAND"
+        else
+            echo "Unknown command: $COMMAND"
+            echo "Usage: ./range [up|down|list|status|reset] [challenge_id]"
+            exit 1
+        fi
+        ;;
+esac

@@ -1,4 +1,4 @@
-"""Access & permissions — NBody Agent's "Manage access and permissions" surface.
+"""Access & permissions — Orbit's "Manage access and permissions" surface.
 
   * templates: Full access / Read only / Custom (per-permission read+write toggles)
   * an API token created on the user's behalf, scoped to the grant, rotated on change
@@ -18,7 +18,7 @@ ALL_PERMISSIONS: list[str] = []
 TEMPLATES = {
     "full": "Full access — read your resources and propose changes. Every write still "
             "requires your approval before it executes.",
-    "read_only": "Read only — read and inspect your resources. NBody Agent cannot change "
+    "read_only": "Read only — read and inspect your resources. Orbit cannot change "
                  "anything.",
     "custom": "Custom — choose individual permissions yourself.",
 }

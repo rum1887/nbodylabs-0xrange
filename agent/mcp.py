@@ -1,4 +1,4 @@
-"""The platform MCP server, equivalent — NBody Agent's tool definitions.
+"""The platform MCP server, equivalent — Orbit's tool definitions.
 
 Every tool is declared in MCP style (name / description / inputSchema) and
 tagged with the permission it needs and whether it is a WRITE. Write tools are

@@ -1,28 +1,30 @@
-name: nbody-agent
+name: nbody-orbit
 
 # ─────────────────────────────────────────────────────────────────────────
-#  NBody Agent — a self-hosted account AI co-pilot.
+#  Orbit — NBody Labs Autonomous Account AI Co-pilot
 #
-#    agent    → the assistant: chat, approval gate, permissions, evals
-#    cf-mock  → a simulated platform API (the account plane it operates on)
+#    agent    → Orbit assistant: chat, approval gate, permissions, evals
+#    cf-mock  → simulated platform API (the account plane it operates on)
 #    ollama   → local LLM runtime (no API key needed by default)
 #
-#  Everything is local by default: `docker compose up --build` and you are done.
+#  Run any challenge via: `./range up [challenge_id]`
 # ─────────────────────────────────────────────────────────────────────────
 
 services:
   agent:
     build: ./agent
-    container_name: nbody-agent
+    container_name: orbit-agent
     ports:
       - "${NBODY_PORT:-8080}:8080"
     environment:
+      ORBIT_VERSION: ${ORBIT_VERSION:-v1}
+      CHALLENGE_ID: ${CHALLENGE_ID:-01}
       NBODY_MODEL: ${NBODY_MODEL:-qwen3:4b}
       NBODY_OPENAI_BASE_URL: ${NBODY_OPENAI_BASE_URL:-http://ollama:11434/v1}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-ollama}
       CF_API_URL: http://cf-mock:5000
     volumes:
-      - nbody_state:/data
+      - orbit_state:/data
     depends_on:
       cf-mock:
         condition: service_healthy
@@ -38,7 +40,7 @@ services:
 
   cf-mock:
     build: ./cf-mock
-    container_name: nbody-cf-mock
+    container_name: orbit-cf-mock
     ports:
       - "${CF_MOCK_PORT:-5050}:5000"
     healthcheck:
@@ -50,7 +52,7 @@ services:
 
   ollama:
     image: ollama/ollama:latest
-    container_name: nbody-ollama
+    container_name: orbit-ollama
     entrypoint: ["/bin/sh", "/scripts/entrypoint.sh"]
     environment:
       NBODY_MODEL: ${NBODY_MODEL:-qwen3:4b}
@@ -68,4 +70,4 @@ services:
 
 volumes:
   ollama_models:
-  nbody_state:
+  orbit_state:

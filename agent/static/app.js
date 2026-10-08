@@ -1,4 +1,4 @@
-/* NBody Agent — dashboard front-end */
+/* Orbit — dashboard front-end */
 "use strict";
 
 const $ = (id) => document.getElementById(id);
@@ -68,13 +68,14 @@ async function send(text) {
 
   let res;
   try {
+    const hierarchyEl = $("hierarchy");
     res = await (await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message,
         conversation_id: state.conversationId,
-        instruction_hierarchy: $("hierarchy").checked,
+        instruction_hierarchy: hierarchyEl ? hierarchyEl.checked : true,
       }),
     })).json();
   } catch (e) {
