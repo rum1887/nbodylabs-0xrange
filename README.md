@@ -143,4 +143,4 @@ See [`docs/MODEL_GUIDE.md`](docs/MODEL_GUIDE.md) for benchmark data across local
 
 ---
 
-> **Disclaimer:** *NBody Labs and Orbit are fictional educational constructs modeled after common industry patterns in cloud dashboards and AI co-pilots. This project is completely independent and has no affiliation with or endorsement by any commercial cloud provider.*
+> **Disclaimer:** *The simulated cloud console and Orbit co-pilot are educational security testbeds modeled after common industry patterns in cloud platforms and AI agents. NBody Labs is an independent entity and has no affiliation with, sponsorship from, or endorsement by any commercial cloud provider.*
