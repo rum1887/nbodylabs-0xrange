@@ -8,6 +8,7 @@ This directory contains configuration profiles for each security lab in the NBod
 nbodylabs-0xrange/
 ├── challenges/
 │   ├── 01-goal-hijacking/
+│   │   ├── README.md                   # Scenario briefing, rules & report guide
 │   │   └── config.env                  # Challenge 01 metadata & env
 │   └── 02-<future-challenge>/
 │       ├── config.env                  # Defines ORBIT_VERSION=v2, ports, etc.
