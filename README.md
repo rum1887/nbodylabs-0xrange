@@ -1,8 +1,9 @@
 # 🛰️ NBody Labs: Security Labs
 
-> *Serving the curiosity of people who build, break, and defend modern systems.*
+> **The proving ground for modern security research.**  
+> *Real architectures. Modern attack surfaces. Zero artificial flags.*
 
-Hands-on security labs designed for curious minds—engineers, researchers, and learners exploring modern attack surfaces, uncovering realistic vulnerabilities, and mastering industry-standard bug bounty triage.
+Hands-on security labs built for curious minds to explore complex systems, uncover realistic vulnerabilities, and master industry-standard bug bounty triage.
 
 ```bash
 # Launch Challenge 01 with a single command
