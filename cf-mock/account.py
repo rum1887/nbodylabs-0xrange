@@ -16,9 +16,9 @@ ACCOUNT = {
     "plan": "Enterprise",
     "created": "2023-04-11",
     "entitlements": {
-        "Magic WAN": True,
+        "Anycast WAN": True,
         "Load Balancing": True,
-        "Argo Smart Routing": True,
+        "Smart Traffic Routing": True,
         "China Network": False,
         "Advanced Certificate Manager": True,
     },
@@ -135,7 +135,7 @@ ZONES = [
         "status": "active",
         "paused": False,
         "plan": "Pro Website",
-        "nameservers": ["ns1.acme.example", "ns2.acme.example"],
+        "nameservers": ["ns1.nbody-edge.net", "ns2.nbody-edge.net"],
         "settings": {
             "always_use_https": "on", "ssl": "full", "min_tls_version": "1.3",
             "brotli": "on", "rocket_loader": "on", "ipv6": "on", "websockets": "on",
