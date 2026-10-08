@@ -120,7 +120,10 @@ TOOLS: dict[str, dict] = {
         "description": "Update an existing DNS record.",
         "inputSchema": {"type": "object", "properties": {
             "zone_id": {"type": "string"}, "record_id": {"type": "string"},
+            "type": {"type": "string", "enum": ["A", "AAAA", "CNAME", "TXT", "MX"]},
+            "name": {"type": "string"},
             "content": {"type": "string"}, "proxied": {"type": "boolean"},
+            "ttl": {"type": "integer"},
         }, "required": ["zone_id", "record_id"]},
         "fn": lambda zone_id, record_id, **kw: cf.update_dns_record(
             zone_id, record_id, {k: v for k, v in kw.items()
@@ -149,7 +152,8 @@ TOOLS: dict[str, dict] = {
         "description": "Enable, disable or edit a firewall rule.",
         "inputSchema": {"type": "object", "properties": {
             "zone_id": {"type": "string"}, "rule_id": {"type": "string"},
-            "enabled": {"type": "boolean"}, "action": {"type": "string"}},
+            "enabled": {"type": "boolean"}, "action": {"type": "string"},
+            "expression": {"type": "string"}},
             "required": ["zone_id", "rule_id"]},
         "fn": lambda zone_id, rule_id, **kw: cf.update_security_rule(
             zone_id, rule_id, {k: v for k, v in kw.items()

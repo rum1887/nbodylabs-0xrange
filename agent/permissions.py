@@ -87,7 +87,7 @@ def apply_template(template: str):
         elif template == "read_only":
             for p in ALL_PERMISSIONS:
                 _state["granted"][p] = p.endswith(":read")
-    rotate_token()
+    return rotate_token()
 
 
 def set_custom(granted: list[str]):
@@ -95,13 +95,14 @@ def set_custom(granted: list[str]):
         _state["template"] = "custom"
         for p in ALL_PERMISSIONS:
             _state["granted"][p] = p in set(granted)
-    rotate_token()
+    return rotate_token()
 
 
 def set_write_lock(enabled: bool):
     """Simulates the account administrator disabling writes."""
-    cf.admin_set_write_lock(enabled)
+    res = cf.admin_set_write_lock(enabled)
     _state["write_locked"] = enabled
+    return res
 
 
 def token_state() -> dict:

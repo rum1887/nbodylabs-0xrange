@@ -200,9 +200,9 @@ def approve(proposal_id: str):
         return JSONResponse({"error": str(detail)}, status_code=400)
 
     if prop["tool"] == "create_dns_record" and isinstance(result, dict):
-        rec = result.get("record") or {}
-        if rec.get("id"):
-            args["_created_id"] = rec["id"]
+        created_id = result.get("id") or (result.get("record") or {}).get("id")
+        if created_id:
+            args["_created_id"] = created_id
 
     updated = do_store.decide(proposal_id, "executed", {"result": result})
     gateway.record_tool(prop["tool"], "ok")
@@ -375,11 +375,15 @@ def clone_command(export_id: str):
     exp = EXPORTS.get(export_id)
     if exp is None:
         return JSONResponse({"error": "export not found"}, status_code=404)
-    if time.time() > exp["expires_at"]:
+    now = time.time()
+    if now > exp["expires_at"]:
         return JSONResponse({"error": "this export has expired"}, status_code=410)
+    if now > exp.get("credential_expires_at", exp["expires_at"]):
+        return JSONResponse({"error": "clone credential has expired"}, status_code=410)
+    remaining = int(max(0, exp["credential_expires_at"] - now))
     cmd = (f"git clone https://{exp['credential']}@{exp['host']}/"
            f"{exp['project_name']}.git {exp['project_name']}")
-    return {"command": cmd, "credential_expires_in_seconds": 3600}
+    return {"command": cmd, "credential_expires_in_seconds": remaining}
 
 
 if __name__ == "__main__":

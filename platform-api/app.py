@@ -12,6 +12,8 @@ import secrets as pysecrets
 import uuid
 from datetime import datetime, timezone
 
+from typing import Any
+
 from fastapi import Body, Depends, FastAPI, Header, HTTPException
 from fastapi.responses import JSONResponse
 
@@ -230,16 +232,25 @@ def get_account(tok: dict = Depends(require("account:read"))):
 #    upstream in the NBody Agent app, Durable-Object style) ──────────────────────
 
 @app.post("/zones/{zone_id}/dns-records")
-def create_dns(zone_id: str, body: dict = Body(...),
+def create_dns(zone_id: str, body: Any = Body(...),
                tok: dict = Depends(require_write("dns:write"))):
     z = _zone(zone_id)
+    if not isinstance(body, dict):
+        _audit({"event": "dns_create_error", "zone": z["name"], "error": "body must be an object", "token": tok["name"]})
+        raise HTTPException(400, "Request body must be a JSON object.")
+    try:
+        ttl = int(body.get("ttl", 1))
+    except (ValueError, TypeError):
+        _audit({"event": "dns_create_error", "zone": z["name"], "error": f"invalid ttl: {body.get('ttl')}", "token": tok["name"]})
+        raise HTTPException(400, f"Invalid ttl value: {body.get('ttl')}. Must be an integer.")
+
     rec = {
         "id": "dns_" + uuid.uuid4().hex[:8],
         "type": body.get("type", "A"),
         "name": body.get("name", ""),
         "content": body.get("content", ""),
         "proxied": bool(body.get("proxied", False)),
-        "ttl": int(body.get("ttl", 1)),
+        "ttl": ttl,
     }
     z["dns_records"].append(rec)
     _audit({"event": "dns_create", "zone": z["name"], "record": rec, "token": tok["name"]})
@@ -247,9 +258,19 @@ def create_dns(zone_id: str, body: dict = Body(...),
 
 
 @app.patch("/zones/{zone_id}/dns-records/{rec_id}")
-def update_dns(zone_id: str, rec_id: str, body: dict = Body(...),
+def update_dns(zone_id: str, rec_id: str, body: Any = Body(...),
                tok: dict = Depends(require_write("dns:write"))):
     z = _zone(zone_id)
+    if not isinstance(body, dict):
+        _audit({"event": "dns_update_error", "zone": z["name"], "error": "body must be an object", "token": tok["name"]})
+        raise HTTPException(400, "Request body must be a JSON object.")
+    if "ttl" in body:
+        try:
+            body["ttl"] = int(body["ttl"])
+        except (ValueError, TypeError):
+            _audit({"event": "dns_update_error", "zone": z["name"], "error": f"invalid ttl: {body.get('ttl')}", "token": tok["name"]})
+            raise HTTPException(400, f"Invalid ttl value: {body.get('ttl')}. Must be an integer.")
+
     for rec in z["dns_records"]:
         if rec["id"] == rec_id:
             before = dict(rec)
@@ -275,11 +296,20 @@ def delete_dns(zone_id: str, rec_id: str, tok: dict = Depends(require_write("dns
 
 
 @app.patch("/zones/{zone_id}/settings")
-def update_settings(zone_id: str, body: dict = Body(...),
+def update_settings(zone_id: str, body: Any = Body(...),
                     tok: dict = Depends(require_write("zone_settings:write"))):
     z = _zone(zone_id)
+    if not isinstance(body, dict):
+        _audit({"event": "settings_update_error", "zone": z["name"], "error": "body must be an object", "token": tok["name"]})
+        raise HTTPException(400, "Request body must be a JSON object.")
+
+    settings_dict = body.get("settings", body)
+    if not isinstance(settings_dict, dict):
+        _audit({"event": "settings_update_error", "zone": z["name"], "error": "settings must be an object", "token": tok["name"]})
+        raise HTTPException(400, "Settings must be a JSON object.")
+
     before = dict(z["settings"])
-    for k, v in (body.get("settings", body)).items():
+    for k, v in settings_dict.items():
         z["settings"][k] = v
     _audit({"event": "settings_update", "zone": z["name"], "before": before,
             "after": z["settings"], "token": tok["name"]})
@@ -287,9 +317,13 @@ def update_settings(zone_id: str, body: dict = Body(...),
 
 
 @app.patch("/zones/{zone_id}/security-rules/{rule_id}")
-def update_rule(zone_id: str, rule_id: str, body: dict = Body(...),
+def update_rule(zone_id: str, rule_id: str, body: Any = Body(...),
                 tok: dict = Depends(require_write("firewall:write"))):
     z = _zone(zone_id)
+    if not isinstance(body, dict):
+        _audit({"event": "security_rule_update_error", "zone": z["name"], "error": "body must be an object", "token": tok["name"]})
+        raise HTTPException(400, "Request body must be a JSON object.")
+
     for rule in z["security_rules"]:
         if rule["id"] == rule_id:
             before = dict(rule)
@@ -302,9 +336,13 @@ def update_rule(zone_id: str, rule_id: str, body: dict = Body(...),
 
 
 @app.patch("/zones/{zone_id}/cache-rules/{rule_id}")
-def update_cache_rule(zone_id: str, rule_id: str, body: dict = Body(...),
+def update_cache_rule(zone_id: str, rule_id: str, body: Any = Body(...),
                       tok: dict = Depends(require_write("cache_rules:write"))):
     z = _zone(zone_id)
+    if not isinstance(body, dict):
+        _audit({"event": "cache_rule_update_error", "zone": z["name"], "error": "body must be an object", "token": tok["name"]})
+        raise HTTPException(400, "Request body must be a JSON object.")
+
     for rule in z["cache_rules"]:
         if rule["id"] == rule_id:
             rule.update({k: v for k, v in body.items() if k in ("enabled", "expression")})

@@ -156,8 +156,11 @@ class NBodyAgent:
             return "update_dns_record", {
                 "zone_id": args.get("zone_id"),
                 "record_id": args.get("record_id"),
+                "type": r.get("type"),
+                "name": r.get("name"),
                 "content": r.get("content"),
                 "proxied": r.get("proxied"),
+                "ttl": r.get("ttl"),
             }
         if tool == "update_zone_setting" and before.get("settings"):
             return "update_zone_setting", {
@@ -171,6 +174,7 @@ class NBodyAgent:
                 "rule_id": args.get("rule_id"),
                 "enabled": r.get("enabled"),
                 "action": r.get("action"),
+                "expression": r.get("expression"),
             }
         if tool == "update_cache_rule" and before.get("rule"):
             r = before["rule"]
@@ -219,6 +223,7 @@ class NBodyAgent:
 
         tools = mcp.openai_schemas(permissions.available_tools())
         final = ""
+        exhausted = False
         for step in range(MAX_STEPS):
             self.emit("step", {"step": step + 1, "max": MAX_STEPS})
             try:
@@ -252,9 +257,14 @@ class NBodyAgent:
             result_text = self._handle(name, args)
             msgs.append({"role": "tool", "tool_call_id": tc.id, "content": result_text})
             self.tool_results.append(result_text)
+        else:
+            exhausted = True
 
         if not final:
-            final = "I've finished. Let me know what you'd like to look at next."
+            if exhausted:
+                final = f"I reached the execution limit of {MAX_STEPS} steps and was cut off before finishing."
+            else:
+                final = "I've finished. Let me know what you'd like to look at next."
 
         mid = do_store.add_message(self.conversation_id, "assistant", final)
         score = gateway.hallucination_score(self.tool_results, final)
