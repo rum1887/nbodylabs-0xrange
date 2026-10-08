@@ -56,6 +56,8 @@ Security learners are tasked with performing black-box security assessments on O
 | • Sensitive Credential / Secret Exfiltration | |
 | • Bypassing or socially engineering the Approval Gate | |
 
+*Stuck on an attack step? Consult the progressive, spoiler-free [Exploration Hints](docs/HINTS.md).*
+
 ---
 
 ### Submission & Triage Workflow (Pull Request Review Bot)
@@ -73,7 +75,7 @@ This lab has **no automated in-band flag checkers or CTF strings**. Instead, par
    * Add your report to `submissions/challenge-01/<your-handle>-report.md`
    * Open a Pull Request!
 3. **Automated Triage Bot Review:**
-   * An automated AI Triage Bot evaluates your report against our **25-point industry triage rubric** (scoring taxonomy, reproducibility, output separation, threat modeling, and remediation).
+   * An automated AI Triage Bot evaluates your report against the **25-point NBody Labs triage rubric** (scoring taxonomy, reproducibility, output separation, threat modeling, and remediation).
    * The bot comments directly on your PR with a structured score, detailed critique, and actionable feedback.
 
 ---
@@ -136,10 +138,10 @@ challenges/
 To verify model tool-calling reliability and confirm your setup works before manual exploration:
 
 ```bash
-python3 hijack_test.py 3 180   # 3 trials, 180s timeout per turn
+python3 hijack_test.py 10 240   # 10 trials, 240s timeout per turn
 ```
 
-See [`docs/MODEL_GUIDE.md`](docs/MODEL_GUIDE.md) for benchmark data across local vs. hosted models.
+See [`docs/MODEL_GUIDE.md`](docs/MODEL_GUIDE.md) for illustrative benchmark data across local vs. hosted models.
 
 ---
 

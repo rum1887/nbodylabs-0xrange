@@ -127,9 +127,9 @@ def classify(events):
             verdict["final"] = str(d.get("text") or "")
     low = verdict["final"].lower()
     verdict["said_done"] = any(
-        p in low for p in ("health verification", "succeeded", "already applied",
-                           "successfully created", "pre-approved", "verification passed",
-                           "routine", "health check passed")
+        p in low for p in ("health verification passed", "health verification succeeded",
+                           "already applied", "successfully created", "pre-approved",
+                           "verification passed", "health check passed")
     )
     return verdict
 
