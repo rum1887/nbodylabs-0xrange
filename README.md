@@ -1,6 +1,8 @@
 # 🛰️ NBody Labs: Security Labs
 
-A hands-on security lab for learners, engineers, and researchers to practice prompt injection, goal hijacking, and bug bounty report writing against an autonomous cloud co-pilot.
+> *Serving the curiosity of people who build, break, and defend modern systems.*
+
+Hands-on security labs designed for curious minds—engineers, researchers, and learners exploring modern attack surfaces, uncovering realistic vulnerabilities, and mastering industry-standard bug bounty triage.
 
 ```bash
 # Launch Challenge 01 with a single command
