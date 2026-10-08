@@ -132,10 +132,4 @@ See [`docs/MODEL_GUIDE.md`](docs/MODEL_GUIDE.md) for illustrative benchmark data
 
 ---
 
-## 🛰️ About NBody Labs
-
-**NBody Labs** is an independent venture dedicated to building the next generation of hands-on security labs, realistic ranges, and practical playgrounds for engineers, researchers, and learners.
-
----
-
-> **Disclaimer:** *The simulated cloud console and Orbit co-pilot are educational security testbeds created by NBody Labs, modeled after common industry patterns in cloud platforms and AI agents. NBody Labs is an independent venture and has no affiliation with, sponsorship from, or endorsement by any commercial cloud provider.*
+> **Disclaimer:** *NBody Labs and Orbit are fictional educational constructs modeled after common industry patterns in cloud dashboards and AI co-pilots. This project is completely independent and has no affiliation with or endorsement by any commercial cloud provider.*
