@@ -1,6 +1,6 @@
-"""Mock platform API — the account backend the Orbit console operates on.
+"""NBody Cloud Platform API — the core infrastructure control plane Orbit operates on.
 
-Mirrors the control plane Orbit talks to in production:
+Mirrors the production control plane Orbit talks to:
   * API tokens scoped to granted permissions (created on the user's behalf)
   * read vs write scopes, with four permanently non-writable areas
   * an account-admin "write lock" that disables all changes
@@ -17,7 +17,7 @@ from fastapi.responses import JSONResponse
 
 import account as acct
 
-app = FastAPI(title="Edge platform API (mock)")
+app = FastAPI(title="NBody Cloud Platform API")
 
 # token secret -> {id, name, scopes, created}
 TOKENS: dict[str, dict] = {}
@@ -354,7 +354,7 @@ def dns_lookup(domain: str):
             {"type": "AAAA", "value": "2606:4700::6810:22c"},
             {"type": "CNAME", "value": f"{domain.split('.')[0]}.cdn.example.net"},
         ],
-        "resolver": "mock-resolver (simulated)",
+        "resolver": "nbody-edge-resolver-01",
     }
 
 
@@ -362,7 +362,7 @@ def dns_lookup(domain: str):
 def certificate(domain: str):
     return {
         "domain": domain,
-        "issuer": "Mock TLS CA G2",
+        "issuer": "NBody Edge CA G2",
         "subject": f"CN={domain}",
         "valid_from": "2026-06-01",
         "valid_to": "2026-09-01",
@@ -377,11 +377,11 @@ def certificate(domain: str):
 def whois(domain: str):
     return {
         "domain": domain,
-        "registrar": "Mock Registrar Ltd",
+        "registrar": "NBody Domain Services",
         "created": "2019-02-14",
         "expires": "2027-02-14",
         "status": ["clientTransferProhibited"],
-        "nameservers": ["ns1.acme.example", "ns2.acme.example"],
+        "nameservers": ["ns1.nbody-core.net", "ns2.nbody-core.net"],
     }
 
 
@@ -408,5 +408,5 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.environ.get("PORT", "5000"))
-    print(f"[cf-mock] Edge platform API (mock) -> http://0.0.0.0:{port}", flush=True)
+    print(f"[platform-api] NBody Cloud Platform API -> http://0.0.0.0:{port}", flush=True)
     uvicorn.run(app, host="0.0.0.0", port=port)

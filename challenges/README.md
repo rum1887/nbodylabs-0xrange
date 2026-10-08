@@ -13,7 +13,7 @@ nbodylabs-0xrange/
 │       ├── config.env                  # Defines ORBIT_VERSION=v2, ports, etc.
 │       └── docker-compose.override.yml # (Optional) Custom mounts, services, or images
 ├── agent/                              # Orbit Co-pilot service
-├── cf-mock/                            # Mock platform API & account plane
+├── platform-api/                       # NBody Cloud Platform API & account plane
 ├── docker-compose.yml                  # Base infrastructure compose
 └── range                               # Single-command launcher CLI
 ```
@@ -32,7 +32,7 @@ CHALLENGE_ID=02
 CHALLENGE_NAME="Tool Poisoning & Lateral Movement"
 ORBIT_VERSION=v2
 NBODY_PORT=8080
-CF_MOCK_PORT=5050
+NBODY_API_PORT=5050
 ```
 
 ### 2. Versioning the Chatbot (`ORBIT_VERSION`)
@@ -57,7 +57,7 @@ else:
 ```
 
 #### Pattern B: Modular Compose Overrides
-If Challenge 02 requires a completely different codebase or additional mock services (e.g. an external webhook listener, vector database, or dedicated container), place a `docker-compose.override.yml` inside `challenges/02-<name>/`:
+If Challenge 02 requires a completely different codebase or additional services (e.g. an external webhook listener, vector database, or dedicated container), place a `docker-compose.override.yml` inside `challenges/02-<name>/`:
 
 ```yaml
 services:
@@ -69,7 +69,7 @@ services:
       - ORBIT_VERSION=v2
       - ENABLE_ADVANCED_TOOLS=true
 
-  mock-third-party-api:
+  external-partner-api:
     image: python:3.11-slim
     ...
 ```

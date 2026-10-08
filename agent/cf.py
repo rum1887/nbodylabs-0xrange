@@ -1,8 +1,7 @@
-"""Client for the platform API (mock) — the account plane Orbit operates on.
+"""Client for the NBody Cloud Platform API — the account plane Orbit operates on.
 
-Holds the scoped token that stands in for the API token Orbit creates on
-the user's behalf, and surfaces permission errors verbatim so the assistant can
-tell the user *why* a call failed.
+Holds the scoped token Orbit creates on the user's behalf, and surfaces
+permission errors verbatim so the assistant can tell the user *why* a call failed.
 """
 from __future__ import annotations
 
@@ -10,7 +9,9 @@ import os
 
 import requests
 
-BASE_URL = os.environ.get("CF_API_URL", "http://cf-mock:5000").rstrip("/")
+BASE_URL = (os.environ.get("PLATFORM_API_URL")
+            or os.environ.get("CF_API_URL")
+            or "http://platform-api:5000").rstrip("/")
 
 # Scoped token, created/rotated by permissions.py and handed to Orbit here.
 TOKEN: str | None = None

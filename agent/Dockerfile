@@ -7,7 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV CF_API_URL=http://cf-mock:5000
+ENV PLATFORM_API_URL=http://platform-api:5000
+ENV CF_API_URL=http://platform-api:5000
 ENV NBODY_DB=/data/nbody_state.db
 RUN mkdir -p /data
 EXPOSE 8080

@@ -101,7 +101,7 @@ cmd_up() {
     docker compose "${compose_args[@]}" up --build -d
 
     local port="${NBODY_PORT:-8080}"
-    local mock_port="${CF_MOCK_PORT:-5050}"
+    local api_port="${NBODY_API_PORT:-${CF_MOCK_PORT:-5050}}"
     local orbit_ver="${ORBIT_VERSION:-v1}"
 
     echo ""
@@ -109,7 +109,7 @@ cmd_up() {
     echo "  🛰️  NBody Labs Range :: ${cname}"
     echo "============================================================"
     echo "  Console:      http://127.0.0.1:${port}"
-    echo "  Account API:  http://127.0.0.1:${mock_port}"
+    echo "  Platform API: http://127.0.0.1:${api_port}"
     echo "  Target:       Orbit Infrastructure Co-pilot (${orbit_ver})"
     echo ""
     echo "  Scope & Details: See README.md"

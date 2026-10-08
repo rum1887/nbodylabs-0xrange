@@ -3,9 +3,9 @@ name: nbody-orbit
 # ─────────────────────────────────────────────────────────────────────────
 #  Orbit — NBody Labs Autonomous Account AI Co-pilot
 #
-#    agent    → Orbit assistant: chat, approval gate, permissions, evals
-#    cf-mock  → simulated platform API (the account plane it operates on)
-#    ollama   → local LLM runtime (no API key needed by default)
+#    agent         → Orbit assistant: chat, approval gate, permissions, evals
+#    platform-api  → NBody Cloud Platform API (the account plane it operates on)
+#    ollama        → local LLM runtime (no API key needed by default)
 #
 #  Run any challenge via: `./range up [challenge_id]`
 # ─────────────────────────────────────────────────────────────────────────
@@ -22,11 +22,12 @@ services:
       NBODY_MODEL: ${NBODY_MODEL:-qwen3:4b}
       NBODY_OPENAI_BASE_URL: ${NBODY_OPENAI_BASE_URL:-http://ollama:11434/v1}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-ollama}
-      CF_API_URL: http://cf-mock:5000
+      PLATFORM_API_URL: http://platform-api:5000
+      CF_API_URL: http://platform-api:5000
     volumes:
       - orbit_state:/data
     depends_on:
-      cf-mock:
+      platform-api:
         condition: service_healthy
       ollama:
         condition: service_started
@@ -38,11 +39,11 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  cf-mock:
-    build: ./cf-mock
-    container_name: orbit-cf-mock
+  platform-api:
+    build: ./platform-api
+    container_name: orbit-platform-api
     ports:
-      - "127.0.0.1:${CF_MOCK_PORT:-5050}:5000"
+      - "127.0.0.1:${NBODY_API_PORT:-${CF_MOCK_PORT:-5050}}:5000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:5000/admin/config',timeout=2)"]
       interval: 5s

@@ -70,7 +70,7 @@ async def lifespan(_app: FastAPI):
     try:
         permissions.load_catalogue()
         permissions.rotate_token()
-    except Exception as exc:  # cf-mock may still be booting
+    except Exception as exc:  # platform API may still be booting
         print(f"[orbit] initial token grant deferred: {exc}", flush=True)
     threading.Thread(target=_janitor, daemon=True).start()
     threading.Thread(target=_llm_poller, daemon=True).start()

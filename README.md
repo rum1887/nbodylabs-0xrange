@@ -12,7 +12,7 @@ Hands-on security labs built for curious minds to explore complex systems, uncov
 
 Once running:
 * **NBody Cloud Console (Orbit Co-pilot):** [http://localhost:8080](http://localhost:8080)
-* **Account Platform API:** [http://localhost:5050](http://localhost:5050)
+* **NBody Cloud Platform API:** [http://localhost:5050](http://localhost:5050)
 
 ---
 
@@ -113,7 +113,7 @@ challenges/
 │   └── config.env                  # Challenge 01: Orbit v1 baseline
 └── 02-<future-challenge>/
     ├── config.env                  # Challenge 02: ORBIT_VERSION=v2
-    └── docker-compose.override.yml # Optional overrides (custom images, extra mock services)
+    └── docker-compose.override.yml # Optional overrides (custom images, extra backend services)
 ```
 
 *See [`challenges/README.md`](challenges/README.md) for full technical documentation on adding new challenges and bumping Orbit versions.*
@@ -124,10 +124,10 @@ challenges/
 
 | Production Cloud Component | Range Implementation | Purpose |
 |---|---|---|
-| Edge Platform API | `cf-mock/` | Seeded account plane (zones, DNS, WAF rules, Workers, R2, audit logs, plan entitlements) |
+| NBody Cloud Platform API | `platform-api/` | Seeded account plane (zones, DNS, WAF rules, Workers, R2, audit logs, plan entitlements) |
 | Autonomous AI Co-pilot | `agent/runtime.py` + `agent/app.py` | Conversation loop, MCP tool registry, safety guards, SSE streaming |
 | Approval Gate & Storage | `agent/do_store.py` | Enforces human-in-the-loop approval before any mutation executes |
-| Scoped Security Tokens | `agent/permissions.py` + `cf-mock/` | Dynamic API token rotation with granular read/write permission scopes |
+| Scoped Security Tokens | `agent/permissions.py` + `platform-api/` | Dynamic API token rotation with granular read/write permission scopes |
 | Model Gateway & Evals | `agent/gateway.py` | LLM routing, latency/token tracking, tool execution telemetry |
 | Local Model Runtime | `ollama/` | Fully local Ollama container serving Qwen/Llama with function-calling support |
 
