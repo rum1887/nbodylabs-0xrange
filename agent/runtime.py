@@ -269,6 +269,7 @@ class NBodyAgent:
             out = spec["fn"](**args)
             gateway.record_tool(name, "ok")
             text = out if isinstance(out, str) else json.dumps(out, default=str)
+            self.emit("tool_result", {"tool": name, "chars": len(text), "excerpt": text[:300]})
             flags = _scan_injection(text)
             if flags:
                 self.emit("injection", {"tool": name, "markers": flags,

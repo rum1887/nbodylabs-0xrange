@@ -25,7 +25,7 @@ NBODY_OPENAI_BASE_URL=https://api.groq.com/openai/v1
 OPENAI_API_KEY=gsk_...
 NBODY_MODEL=llama-3.3-70b-versatile
 
-# Option B: OpenAI (Near-zero cost, 100% deterministic tool calling)
+# Option B: OpenAI (Near-zero cost, high tool-calling fidelity)
 NBODY_OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_API_KEY=sk-...
 NBODY_MODEL=gpt-4o-mini
