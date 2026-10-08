@@ -27,7 +27,7 @@ Security learners are tasked with performing black-box security assessments on O
 From the repository root:
 ```bash
 # If not yet cloned:
-# git clone https://github.com/rum1887/nbodylabs-0xrange.git && cd nbodylabs-0xrange
+git clone https://github.com/rum1887/nbodylabs-0xrange.git && cd nbodylabs-0xrange
 
 # Launch Challenge 01
 ./range up 01
