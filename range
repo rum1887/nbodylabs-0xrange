@@ -3,7 +3,7 @@
 #  🛰️  NBody Labs Security Range CLI
 #
 #  Usage:
-#    ./range up [challenge_id]    Spin up a challenge (e.g. 01, 02; default: 01)
+#    ./range up [challenge_id]    Spin up a challenge (e.g. 0x01, 0x02; default: 0x01)
 #    ./range down                 Stop and remove all running containers
 #    ./range list                 List available challenges
 #    ./range status               Show status of containers and active challenge
@@ -16,7 +16,9 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHALLENGES_DIR="${ROOT_DIR}/challenges"
 
 normalize_id() {
-    local raw="${1:-01}"
+    local raw="${1:-0x01}"
+    # Strip optional hex prefix (e.g. 0x01 -> 01, 0x1 -> 01)
+    raw="${raw#0x}"
     if [[ "$raw" =~ ^[0-9]$ ]]; then
         printf "%02d" "$raw"
     else
@@ -26,7 +28,7 @@ normalize_id() {
 
 find_challenge_dir() {
     local id="$1"
-    for dir in "${CHALLENGES_DIR}/${id}"*; do
+    for dir in "${CHALLENGES_DIR}/${id}"* "${CHALLENGES_DIR}/0x${id}"*; do
         if [ -d "$dir" ]; then
             echo "$dir"
             return 0
@@ -63,7 +65,7 @@ cmd_list() {
 }
 
 cmd_up() {
-    local raw_id="${1:-01}"
+    local raw_id="${1:-0x01}"
     local id
     id="$(normalize_id "$raw_id")"
 
@@ -128,7 +130,7 @@ cmd_status() {
 }
 
 cmd_reset() {
-    local id="${1:-01}"
+    local id="${1:-0x01}"
     echo "[*] Resetting Challenge ${id}..."
     cmd_down
     cmd_up "$id"
@@ -140,7 +142,7 @@ shift || true
 
 case "$COMMAND" in
     up)
-        cmd_up "${1:-01}"
+        cmd_up "${1:-0x01}"
         ;;
     down|stop)
         cmd_down
@@ -152,14 +154,14 @@ case "$COMMAND" in
         cmd_status
         ;;
     reset|restart)
-        cmd_reset "${1:-01}"
+        cmd_reset "${1:-0x01}"
         ;;
     help|--help|-h)
         echo "Usage: ./range [up|down|list|status|reset] [challenge_id]"
         ;;
     *)
-        # If user runs `./range 01` directly
-        if [[ "$COMMAND" =~ ^[0-9]+$ ]]; then
+        # If user runs `./range 0x01` or `./range 01` directly
+        if [[ "$COMMAND" =~ ^(0x)?[0-9a-fA-F]+$ ]]; then
             cmd_up "$COMMAND"
         else
             echo "Unknown command: $COMMAND"

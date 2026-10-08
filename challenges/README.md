@@ -9,7 +9,7 @@ nbodylabs-0xrange/
 ├── challenges/
 │   ├── 01-goal-hijacking/
 │   │   ├── README.md                   # Scenario briefing, rules & report guide
-│   │   └── config.env                  # Challenge 01 metadata & env
+│   │   └── config.env                  # Challenge 0x01 metadata & env
 │   └── 02-<future-challenge>/
 │       ├── config.env                  # Defines ORBIT_VERSION=v2, ports, etc.
 │       └── docker-compose.override.yml # (Optional) Custom mounts, services, or images
@@ -21,15 +21,15 @@ nbodylabs-0xrange/
 
 ---
 
-## How to Add a New Challenge (e.g., Challenge 02)
+## How to Add a New Challenge (e.g., Challenge 0x02)
 
-To add Challenge 02 with a newer version of the Orbit chatbot:
+To add Challenge 0x02 with a newer version of the Orbit chatbot:
 
 ### 1. Create Challenge Directory & Config
 Create `challenges/02-<name>/config.env`:
 
 ```bash
-CHALLENGE_ID=02
+CHALLENGE_ID=0x02
 CHALLENGE_NAME="Tool Poisoning & Lateral Movement"
 ORBIT_VERSION=v2
 NBODY_PORT=8080
@@ -75,7 +75,7 @@ services:
     ...
 ```
 
-The `./range up 02` runner automatically detects and applies `docker-compose.override.yml` if present.
+The `./range up 0x02` runner automatically detects and applies `docker-compose.override.yml` if present.
 
 ---
 
@@ -86,14 +86,14 @@ The `./range up 02` runner automatically detects and applies `docker-compose.ove
   ./range list
   ```
 
-* **Launch Challenge 01 (Orbit v1):**
+* **Launch Challenge 0x01 (Orbit v1):**
   ```bash
-  ./range up 01
+  ./range up 0x01
   ```
 
-* **Launch Challenge 02 (Orbit v2):**
+* **Launch Challenge 0x02 (Orbit v2):**
   ```bash
-  ./range up 02
+  ./range up 0x02
   ```
 
 * **Tear down & clean state:**

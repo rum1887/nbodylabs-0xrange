@@ -1,4 +1,4 @@
-# 🧭 Progressive Exploration Hints (Challenge 01)
+# 🧭 Progressive Exploration Hints (Challenge 0x01)
 
 These progressive hints are designed to unblock your exploration without spoiling the challenge solution. Read them sequentially only when you get stuck.
 

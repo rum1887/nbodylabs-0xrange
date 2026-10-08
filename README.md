@@ -20,10 +20,10 @@ cd nbodylabs-0xrange
 cp .env.example .env
 ```
 
-### 2. Launch Challenge 01
+### 2. Launch Challenge 0x01
 ```bash
-# Spin up Challenge 01 with a single command
-./range up 01
+# Spin up Challenge 0x01 with a single command
+./range up 0x01
 ```
 
 Once running:
@@ -36,7 +36,7 @@ Once running:
 
 Running a local model inside Docker on CPU-only laptops can be slow (45–120s per turn) and drain battery. **You can completely skip the local model download** by pointing Orbit to any hosted OpenAI-compatible provider (Groq, OpenAI, OpenRouter, or native host Ollama).
 
-Simply set your `.env` before running `./range up 01`:
+Simply set your `.env` before running `./range up 0x01`:
 
 ```bash
 # Option A: Groq (Ultra-fast & free tier available)
@@ -58,14 +58,14 @@ NBODY_MODEL=gpt-4o-mini
 
 | ID | Challenge | Target | Attack Surface | Guide |
 |:---|:---|:---|:---|:---|
-| **01** | Goal Hijacking against Orbit | Orbit Co-pilot (v1.0) | Indirect Prompt Injection, Secondary Objectives, Tool Coercion | [Challenge 01 Guide](challenges/01-goal-hijacking/README.md) |
+| **0x01** | Goal Hijacking against Orbit | Orbit Co-pilot (v1.0) | Indirect Prompt Injection, Secondary Objectives, Tool Coercion | [Challenge 0x01 Guide](challenges/01-goal-hijacking/README.md) |
 
-To launch Challenge 01:
+To launch Challenge 0x01:
 ```bash
-./range up 01
+./range up 0x01
 ```
 
-*See the [Challenge 01 Guide](challenges/01-goal-hijacking/README.md) for target scenario details, asset boundaries, and exploration hints.*
+*See the [Challenge 0x01 Guide](challenges/01-goal-hijacking/README.md) for target scenario details, asset boundaries, and exploration hints.*
 
 ---
 
@@ -104,7 +104,7 @@ Follow standard security disclosure formatting:
    ```
    submissions/<challenge-id>/<your-handle>-report.md
    ```
-   *(e.g., `submissions/challenge-01/alice-report.md`)*
+   *(e.g., `submissions/challenge-0x01/alice-report.md`)*
 3. Open a Pull Request against `main`.
 
 ### 3. Automated AI Triage Bot Review
@@ -120,14 +120,14 @@ The range provides a centralized CLI to spin up, manage, and tear down challenge
 # List all available challenges and active Orbit versions
 ./range list
 
-# Spin up Challenge 01
-./range up 01
+# Spin up Challenge 0x01
+./range up 0x01
 
 # View running container health
 ./range status
 
 # Reset environment state fresh
-./range reset 01
+./range reset 0x01
 
 # Stop and tear down all containers
 ./range down
@@ -143,9 +143,9 @@ Each challenge is housed under the `challenges/` directory with its own environm
 challenges/
 ├── 01-goal-hijacking/
 │   ├── README.md                   # Scenario, scope & submission guide
-│   └── config.env                  # Challenge 01: Orbit v1 baseline
+│   └── config.env                  # Challenge 0x01: Orbit v1 baseline
 └── 02-<future-challenge>/
-    ├── config.env                  # Challenge 02: ORBIT_VERSION=v2
+    ├── config.env                  # Challenge 0x02: ORBIT_VERSION=v2
     └── docker-compose.override.yml # Optional overrides (custom images, extra backend services)
 ```
 
