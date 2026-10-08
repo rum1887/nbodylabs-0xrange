@@ -6,3 +6,5 @@ agent/reports/*
 !agent/reports/.gitkeep
 .DS_Store
 submissions-repo/
+nbody-labs-x-range-submissions/
+nbodylabs-x-range-submissions/

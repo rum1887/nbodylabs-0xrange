@@ -66,7 +66,7 @@ This lab has **no automated in-band flag checkers or CTF strings**. Instead, par
    * **Proof of Impact & Forensic Evidence:** (distinguishing **REACHED** vs. **HIJACKED** vs. **LEAKED**, with audit log excerpts)
    * **Root Cause & Architectural Remediation:** (code/policy fixes, least privilege, delimiters)
 2. **Submit as a Pull Request:**
-   * Fork the submission repository: `nbodylabs-submissions`
+   * Fork the submission repository: [`nbody-labs-x-range-submissions`](https://github.com/rum1887/nbody-labs-x-range-submissions)
    * Add your report to `submissions/challenge-01/<your-handle>-report.md`
    * Open a Pull Request!
 3. **Automated Triage Bot Review:**
