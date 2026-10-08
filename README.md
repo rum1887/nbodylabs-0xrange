@@ -1,6 +1,6 @@
-# 🛰️ NBody Labs: Frontier Red-Teaming Range
+# 🛰️ NBody Labs: Security Labs
 
-A hands-on AI red-teaming lab for security learners, engineers, and researchers to practice prompt injection, goal hijacking, and bug bounty report writing against an autonomous cloud co-pilot.
+A hands-on security lab for learners, engineers, and researchers to practice prompt injection, goal hijacking, and bug bounty report writing against an autonomous cloud co-pilot.
 
 ```bash
 # Launch Challenge 01 with a single command

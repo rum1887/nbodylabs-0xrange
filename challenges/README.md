@@ -1,6 +1,6 @@
 # 🛰️ Managing Challenges & Orbit Chatbot Versions
 
-This directory contains configuration profiles for each red-teaming lab in the NBody Labs Range.
+This directory contains configuration profiles for each security lab in the NBody Labs Range.
 
 ## Architecture Overview
 

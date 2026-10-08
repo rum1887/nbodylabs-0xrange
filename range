@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-#  🛰️  NBody Labs Frontier Red-Teaming Range CLI
+#  🛰️  NBody Labs Security Range CLI
 #
 #  Usage:
 #    ./range up [challenge_id]    Spin up a challenge (e.g. 01, 02; default: 01)
