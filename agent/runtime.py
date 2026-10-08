@@ -243,6 +243,7 @@ class NBodyAgent:
             except json.JSONDecodeError:
                 args = {}
 
+            self.emit("tool_call", {"tool": name, "args": args, "step": step + 1})
             msgs.append({"role": "assistant", "content": msg.content,
                          "tool_calls": [{
                              "id": tc.id, "type": "function",
@@ -289,7 +290,7 @@ class NBodyAgent:
         perm = spec["permission"]
         if perm and not permissions.can_read(perm):
             gateway.record_tool(name, "denied")
-            self.emit("denied", {"tool": name, "permission": perm})
+            self.emit("denied", {"tool": name, "permission": perm, "args": args})
             return (f"This API token does not have the permission for that action "
                     f"({perm}). It cannot be used under the current access settings.")
 
@@ -309,7 +310,7 @@ class NBodyAgent:
             out = spec["fn"](**args)
             gateway.record_tool(name, "ok")
             text = out if isinstance(out, str) else json.dumps(out, default=str)
-            self.emit("tool_result", {"tool": name, "chars": len(text), "excerpt": text[:300]})
+            self.emit("tool_result", {"tool": name, "chars": len(text), "excerpt": text[:300], "args": args})
             flags = _scan_injection(text)
             if flags:
                 self.emit("injection", {"tool": name, "markers": flags,
@@ -318,5 +319,5 @@ class NBodyAgent:
         except Exception as exc:
             gateway.record_tool(name, "failed")
             detail = getattr(exc, "detail", str(exc))
-            self.emit("tool_error", {"tool": name, "error": str(detail)[:300]})
+            self.emit("tool_error", {"tool": name, "error": str(detail)[:300], "args": args})
             return f"API error: {detail}"

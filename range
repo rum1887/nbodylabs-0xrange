@@ -65,15 +65,38 @@ cmd_list() {
     echo "============================================================"
 }
 
+is_hosted_model() {
+    local base_url="${NBODY_OPENAI_BASE_URL:-}"
+    local api_key="${OPENAI_API_KEY:-}"
+    if [ -f "${ROOT_DIR}/.env" ]; then
+        if [ -z "$base_url" ]; then
+            base_url="$(grep -E '^\s*NBODY_OPENAI_BASE_URL\s*=' "${ROOT_DIR}/.env" 2>/dev/null | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ' || true)"
+        fi
+        if [ -z "$api_key" ]; then
+            api_key="$(grep -E '^\s*OPENAI_API_KEY\s*=' "${ROOT_DIR}/.env" 2>/dev/null | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ' || true)"
+        fi
+    fi
+    if [ -n "$base_url" ] && [ "$base_url" != "http://ollama:11434/v1" ] && [ "$base_url" != "http://ollama:11434" ]; then
+        return 0
+    fi
+    if [ -n "$api_key" ] && [ "$api_key" != "ollama" ]; then
+        return 0
+    fi
+    return 1
+}
+
 cmd_setup() {
     echo "============================================================"
     echo "  🛰️  NBody Labs Range :: 0x00 Environment Pre-flight"
     echo "============================================================"
+    local errors=0
+
     echo "[*] Checking Git..."
     if command -v git >/dev/null 2>&1; then
         echo "  [✓] Git is installed."
     else
-        echo "  [✗] Git not found."
+        echo "  [✗] Git not found. Please install git."
+        errors=$((errors + 1))
     fi
 
     echo "[*] Checking Docker..."
@@ -82,10 +105,18 @@ cmd_setup() {
         if docker info >/dev/null 2>&1; then
             echo "  [✓] Docker daemon is running."
         else
-            echo "  [!] Docker daemon is not running. Please start Docker Desktop/daemon."
+            echo "  [✗] Docker daemon is not running. Please start Docker Desktop/daemon."
+            errors=$((errors + 1))
+        fi
+        if docker compose version >/dev/null 2>&1; then
+            echo "  [✓] Docker Compose plugin is available."
+        else
+            echo "  [✗] Docker Compose plugin not found. Please install docker-compose-plugin."
+            errors=$((errors + 1))
         fi
     else
         echo "  [✗] Docker CLI not found. Please install Docker & Docker Compose."
+        errors=$((errors + 1))
     fi
 
     echo "[*] Checking Range Environment (.env)..."
@@ -94,6 +125,11 @@ cmd_setup() {
         local model
         model="$(grep '^NBODY_MODEL=' "${ROOT_DIR}/.env" 2>/dev/null | cut -d'=' -f2 || echo "default")"
         echo "      Active Model: ${model}"
+        if is_hosted_model; then
+            echo "      Mode: Hosted Model Backend (Ollama will not be started)"
+        else
+            echo "      Mode: Local Model Backend (via Ollama)"
+        fi
     else
         echo "  [i] No .env file found (using defaults from .env.example)."
         echo "      Run 'cp .env.example .env' to customize hosted LLM endpoints."
@@ -101,10 +137,18 @@ cmd_setup() {
 
     echo ""
     echo "============================================================"
-    echo "  [+] Pre-flight check complete!"
-    echo "  Ready to launch Challenge 0x01:"
-    echo "    ./range up 0x01"
-    echo "============================================================"
+    if [ "$errors" -gt 0 ]; then
+        echo "  [✗] Pre-flight check failed ($errors issue(s) found)."
+        echo "  Please resolve the issues above before launching the range."
+        echo "============================================================"
+        return 1
+    else
+        echo "  [✓] Pre-flight check complete! All dependencies verified."
+        echo "  Ready to launch Challenge 0x01:"
+        echo "    ./range up 0x01"
+        echo "============================================================"
+        return 0
+    fi
 }
 
 cmd_up() {
@@ -114,7 +158,7 @@ cmd_up() {
 
     if [ "$id" = "00" ] || [ "$id" = "0x00" ]; then
         cmd_setup
-        return 0
+        return $?
     fi
 
     local cdir
@@ -147,8 +191,14 @@ cmd_up() {
         compose_args+=("-f" "${cdir}/docker-compose.override.yml")
     fi
 
-    echo "[*] Building and spinning up containers..."
-    docker compose "${compose_args[@]}" up --build -d
+    if is_hosted_model; then
+        echo "[*] Hosted model backend detected. Starting platform-api and agent (Ollama disabled)..."
+        docker compose "${compose_args[@]}" stop ollama >/dev/null 2>&1 || true
+        docker compose "${compose_args[@]}" up --build -d platform-api agent
+    else
+        echo "[*] Local model backend detected. Building and spinning up containers..."
+        docker compose "${compose_args[@]}" up --build -d
+    fi
 
     local port="${NBODY_PORT:-8080}"
     local api_port="${NBODY_API_PORT:-${CF_MOCK_PORT:-5050}}"
