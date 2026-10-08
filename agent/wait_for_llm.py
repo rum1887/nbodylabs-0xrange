@@ -15,7 +15,13 @@ DEADLINE_SECONDS = 900
 
 
 def _base() -> str:
-    return (os.environ.get("NBODY_OPENAI_BASE_URL") or "http://ollama:11434/v1").rstrip("/")
+    key = (os.environ.get("OPENAI_API_KEY") or "").strip()
+    raw = (os.environ.get("NBODY_OPENAI_BASE_URL") or "").strip()
+    if not raw or (raw in ("http://ollama:11434/v1", "http://ollama:11434") and key and key != "ollama"):
+        if key and key != "ollama":
+            return "https://api.openai.com/v1"
+        return "http://ollama:11434/v1"
+    return raw.rstrip("/")
 
 
 def _get(url: str, timeout: int = 5):

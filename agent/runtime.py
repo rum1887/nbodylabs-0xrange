@@ -202,10 +202,12 @@ class NBodyAgent:
             r = before["record"]
             return "create_dns_record", {
                 "zone_id": args.get("zone_id"),
+                "id": r.get("id"),
                 "type": r.get("type", "A"),
                 "name": r.get("name", ""),
                 "content": r.get("content", ""),
                 "proxied": r.get("proxied", False),
+                "ttl": r.get("ttl", 1),
             }
         if tool == "open_support_case":
             return None, {"error": "Support tickets cannot be undone automatically."}

@@ -24,12 +24,20 @@ class LLMError(Exception):
     pass
 
 
+def _effective_base_url() -> str:
+    api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
+    base_url = (os.environ.get("NBODY_OPENAI_BASE_URL") or "").strip()
+    if not base_url or (base_url in ("http://ollama:11434/v1", "http://ollama:11434") and api_key and api_key != "ollama"):
+        if api_key and api_key != "ollama":
+            return "https://api.openai.com/v1"
+        return "http://ollama:11434/v1"
+    return base_url
+
+
 def _build_client():
     api_key = os.environ.get("OPENAI_API_KEY", "ollama")
-    base_url = (os.environ.get("NBODY_OPENAI_BASE_URL") or "").strip() or None
-    if base_url:
-        return OpenAI(base_url=base_url, api_key=api_key, timeout=300)
-    return OpenAI(api_key=api_key, timeout=300)
+    base_url = _effective_base_url()
+    return OpenAI(base_url=base_url, api_key=api_key, timeout=300)
 
 
 def chat(messages, tools=None, model=None, temperature=0.2, max_retries=4):
@@ -44,7 +52,7 @@ def chat(messages, tools=None, model=None, temperature=0.2, max_retries=4):
             }
             if tools:
                 kwargs["tools"] = tools
-            base = os.environ.get("NBODY_OPENAI_BASE_URL", "") or ""
+            base = _effective_base_url()
             if tools and model.startswith("qwen3") and ("ollama" in base or ":11434" in base):
                 # Ollama qwen3 models think by default; switch it off for this demo.
                 kwargs["extra_body"] = {"think": False}

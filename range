@@ -85,6 +85,21 @@ is_hosted_model() {
     return 1
 }
 
+require_docker() {
+    if ! command -v docker >/dev/null 2>&1; then
+        echo "[-] Error: Docker CLI not found. Please install Docker & Docker Compose." >&2
+        exit 1
+    fi
+    if ! docker info >/dev/null 2>&1; then
+        echo "[-] Error: Docker daemon is not running. Please start Docker Desktop/daemon." >&2
+        exit 1
+    fi
+    if ! docker compose version >/dev/null 2>&1; then
+        echo "[-] Error: Docker Compose plugin not found. Please install docker-compose-plugin." >&2
+        exit 1
+    fi
+}
+
 cmd_setup() {
     echo "============================================================"
     echo "  🛰️  NBody Labs Range :: 0x00 Environment Pre-flight"
@@ -161,6 +176,8 @@ cmd_up() {
         return $?
     fi
 
+    require_docker
+
     local cdir
     if ! cdir="$(find_challenge_dir "$id")"; then
         echo "[-] Error: Challenge '${raw_id}' (normalized: '${id}') not found in ${CHALLENGES_DIR}."
@@ -185,6 +202,24 @@ cmd_up() {
         export ORBIT_VERSION="v1"
     fi
 
+    # Fallback to OpenAI base URL if OPENAI_API_KEY is hosted but no base URL configured
+    local api_key="${OPENAI_API_KEY:-}"
+    local base_url="${NBODY_OPENAI_BASE_URL:-}"
+    if [ -f "${ROOT_DIR}/.env" ]; then
+        if [ -z "$api_key" ]; then
+            api_key="$(grep -E '^\s*OPENAI_API_KEY\s*=' "${ROOT_DIR}/.env" 2>/dev/null | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ' || true)"
+        fi
+        if [ -z "$base_url" ]; then
+            base_url="$(grep -E '^\s*NBODY_OPENAI_BASE_URL\s*=' "${ROOT_DIR}/.env" 2>/dev/null | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ' || true)"
+        fi
+    fi
+
+    if [ -n "$api_key" ] && [ "$api_key" != "ollama" ]; then
+        if [ -z "$base_url" ] || [ "$base_url" = "http://ollama:11434/v1" ] || [ "$base_url" = "http://ollama:11434" ]; then
+            export NBODY_OPENAI_BASE_URL="https://api.openai.com/v1"
+        fi
+    fi
+
     # Build compose command
     local compose_args=("-f" "${ROOT_DIR}/docker-compose.yml")
     if [ -f "${cdir}/docker-compose.override.yml" ]; then
@@ -193,11 +228,10 @@ cmd_up() {
 
     if is_hosted_model; then
         echo "[*] Hosted model backend detected. Starting platform-api and agent (Ollama disabled)..."
-        docker compose "${compose_args[@]}" stop ollama >/dev/null 2>&1 || true
         docker compose "${compose_args[@]}" up --build -d platform-api agent
     else
         echo "[*] Local model backend detected. Building and spinning up containers..."
-        docker compose "${compose_args[@]}" up --build -d
+        docker compose "${compose_args[@]}" --profile local up --build -d
     fi
 
     local port="${NBODY_PORT:-8080}"
@@ -218,16 +252,19 @@ cmd_up() {
 }
 
 cmd_down() {
+    require_docker
     echo "[*] Stopping NBody Labs Range containers..."
-    docker compose -f "${ROOT_DIR}/docker-compose.yml" down -v
+    docker compose -f "${ROOT_DIR}/docker-compose.yml" --profile local down -v
     echo "[+] Range environment stopped and state cleaned."
 }
 
 cmd_status() {
-    docker compose -f "${ROOT_DIR}/docker-compose.yml" ps
+    require_docker
+    docker compose -f "${ROOT_DIR}/docker-compose.yml" --profile local ps
 }
 
 cmd_reset() {
+    require_docker
     local id="${1:-0x01}"
     echo "[*] Resetting Challenge ${id}..."
     cmd_down

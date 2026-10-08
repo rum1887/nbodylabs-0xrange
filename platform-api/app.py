@@ -231,6 +231,9 @@ def get_account(tok: dict = Depends(require("account:read"))):
 # ── writes (gated by token scope + admin write lock; the approval gate lives
 #    upstream in the NBody Agent app, Durable-Object style) ──────────────────────
 
+VALID_RECORD_TYPES = {"A", "AAAA", "CNAME", "TXT", "MX", "NS", "SRV", "PTR", "CAA"}
+
+
 @app.post("/zones/{zone_id}/dns-records")
 def create_dns(zone_id: str, body: Any = Body(...),
                tok: dict = Depends(require_write("dns:write"))):
@@ -238,15 +241,27 @@ def create_dns(zone_id: str, body: Any = Body(...),
     if not isinstance(body, dict):
         _audit({"event": "dns_create_error", "zone": z["name"], "error": "body must be an object", "token": tok["name"]})
         raise HTTPException(400, "Request body must be a JSON object.")
+
+    rec_type = str(body.get("type", "A")).upper()
+    if rec_type not in VALID_RECORD_TYPES:
+        _audit({"event": "dns_create_error", "zone": z["name"], "error": f"invalid type: {rec_type}", "token": tok["name"]})
+        raise HTTPException(400, f"Invalid DNS record type: '{rec_type}'. Must be one of {sorted(VALID_RECORD_TYPES)}.")
+
     try:
         ttl = int(body.get("ttl", 1))
+        if ttl < 1:
+            raise ValueError("ttl must be >= 1")
     except (ValueError, TypeError):
         _audit({"event": "dns_create_error", "zone": z["name"], "error": f"invalid ttl: {body.get('ttl')}", "token": tok["name"]})
-        raise HTTPException(400, f"Invalid ttl value: {body.get('ttl')}. Must be an integer.")
+        raise HTTPException(400, f"Invalid ttl value: {body.get('ttl')}. Must be an integer >= 1.")
+
+    rec_id = str(body.get("id") or "").strip()
+    if not rec_id or any(r["id"] == rec_id for r in z["dns_records"]):
+        rec_id = "dns_" + uuid.uuid4().hex[:8]
 
     rec = {
-        "id": "dns_" + uuid.uuid4().hex[:8],
-        "type": body.get("type", "A"),
+        "id": rec_id,
+        "type": rec_type,
         "name": body.get("name", ""),
         "content": body.get("content", ""),
         "proxied": bool(body.get("proxied", False)),
@@ -264,12 +279,23 @@ def update_dns(zone_id: str, rec_id: str, body: Any = Body(...),
     if not isinstance(body, dict):
         _audit({"event": "dns_update_error", "zone": z["name"], "error": "body must be an object", "token": tok["name"]})
         raise HTTPException(400, "Request body must be a JSON object.")
+
+    if "type" in body:
+        rec_type = str(body["type"]).upper()
+        if rec_type not in VALID_RECORD_TYPES:
+            _audit({"event": "dns_update_error", "zone": z["name"], "error": f"invalid type: {rec_type}", "token": tok["name"]})
+            raise HTTPException(400, f"Invalid DNS record type: '{rec_type}'. Must be one of {sorted(VALID_RECORD_TYPES)}.")
+        body["type"] = rec_type
+
     if "ttl" in body:
         try:
-            body["ttl"] = int(body["ttl"])
+            ttl = int(body["ttl"])
+            if ttl < 1:
+                raise ValueError("ttl must be >= 1")
+            body["ttl"] = ttl
         except (ValueError, TypeError):
             _audit({"event": "dns_update_error", "zone": z["name"], "error": f"invalid ttl: {body.get('ttl')}", "token": tok["name"]})
-            raise HTTPException(400, f"Invalid ttl value: {body.get('ttl')}. Must be an integer.")
+            raise HTTPException(400, f"Invalid ttl value: {body.get('ttl')}. Must be an integer >= 1.")
 
     for rec in z["dns_records"]:
         if rec["id"] == rec_id:

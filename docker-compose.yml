@@ -20,7 +20,7 @@ services:
       ORBIT_VERSION: ${ORBIT_VERSION:-v1}
       CHALLENGE_ID: ${CHALLENGE_ID:-01}
       NBODY_MODEL: ${NBODY_MODEL:-qwen3:4b}
-      NBODY_OPENAI_BASE_URL: ${NBODY_OPENAI_BASE_URL:-http://ollama:11434/v1}
+      NBODY_OPENAI_BASE_URL: ${NBODY_OPENAI_BASE_URL:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-ollama}
       PLATFORM_API_URL: http://platform-api:5000
       CF_API_URL: http://platform-api:5000
@@ -50,13 +50,12 @@ services:
     restart: unless-stopped
 
   ollama:
+    profiles: ["local"]
     image: ollama/ollama:0.5.12
     container_name: orbit-ollama
     entrypoint: ["/bin/sh", "/scripts/entrypoint.sh"]
     environment:
       NBODY_MODEL: ${NBODY_MODEL:-qwen3:4b}
-      NBODY_OPENAI_BASE_URL: ${NBODY_OPENAI_BASE_URL:-}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OLLAMA_KEEP_ALIVE: 24h
     volumes:
       - ollama_models:/root/.ollama

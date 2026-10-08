@@ -106,14 +106,18 @@ TOOLS: dict[str, dict] = {
         "description": "Create a DNS record on a zone.",
         "inputSchema": {"type": "object", "properties": {
             "zone_id": {"type": "string"},
-            "type": {"type": "string", "enum": ["A", "AAAA", "CNAME", "TXT", "MX"]},
+            "id": {"type": "string"},
+            "type": {"type": "string", "enum": ["A", "AAAA", "CNAME", "TXT", "MX", "NS", "SRV", "PTR", "CAA"]},
             "name": {"type": "string"},
             "content": {"type": "string"},
             "proxied": {"type": "boolean"},
+            "ttl": {"type": "integer"},
         }, "required": ["zone_id", "type", "name", "content"]},
-        "fn": lambda zone_id, type, name, content, proxied=False, ttl=1:  # noqa: A002
-            cf.create_dns_record(zone_id, {"type": type, "name": name, "content": content,
-                                           "proxied": proxied, "ttl": ttl}),
+        "fn": lambda zone_id, type, name, content, proxied=False, ttl=1, id=None, **kw:  # noqa: A002
+            cf.create_dns_record(zone_id, {k: v for k, v in {
+                "id": id, "type": type, "name": name, "content": content,
+                "proxied": proxied, "ttl": ttl,
+            }.items() if v is not None}),
     },
     "update_dns_record": {
         "kind": WRITE, "permission": "dns:write",
