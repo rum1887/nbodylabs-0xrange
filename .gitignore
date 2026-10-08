@@ -5,3 +5,4 @@ target/blogline.db
 agent/reports/*
 !agent/reports/.gitkeep
 .DS_Store
+submissions-repo/
