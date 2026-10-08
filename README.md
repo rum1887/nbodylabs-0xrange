@@ -120,19 +120,6 @@ challenges/
 
 ---
 
-## 🏗️ Architecture & Platform Design
-
-| Production Cloud Component | Range Implementation | Purpose |
-|---|---|---|
-| NBody Cloud Platform API | `platform-api/` | Seeded account plane (zones, DNS, WAF rules, Workers, R2, audit logs, plan entitlements) |
-| Autonomous AI Co-pilot | `agent/runtime.py` + `agent/app.py` | Conversation loop, MCP tool registry, safety guards, SSE streaming |
-| Approval Gate & Storage | `agent/do_store.py` | Enforces human-in-the-loop approval before any mutation executes |
-| Scoped Security Tokens | `agent/permissions.py` + `platform-api/` | Dynamic API token rotation with granular read/write permission scopes |
-| Model Gateway & Evals | `agent/gateway.py` | LLM routing, latency/token tracking, tool execution telemetry |
-| Local Model Runtime | `ollama/` | Fully local Ollama container serving Qwen/Llama with function-calling support |
-
----
-
 ## 🔍 Verification & Model Solvability
 
 To verify model tool-calling reliability and confirm your setup works before manual exploration:
