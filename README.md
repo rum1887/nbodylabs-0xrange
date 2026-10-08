@@ -6,8 +6,23 @@
 NBody Labs is an independent venture dedicated to building the next generation of hands-on security labs, realistic ranges, and practical playgrounds for engineers, researchers, and learners.
 
 
+---
+
+## 🚀 Quick Start
+
+### 1. Clone & Setup
 ```bash
-# Launch Challenge 01 with a single command
+# Clone the lab repository
+git clone https://github.com/rum1887/nbodylabs-0xrange.git
+cd nbodylabs-0xrange
+
+# (Optional) Copy example environment configuration
+cp .env.example .env
+```
+
+### 2. Launch Challenge 01
+```bash
+# Spin up Challenge 01 with a single command
 ./range up 01
 ```
 
