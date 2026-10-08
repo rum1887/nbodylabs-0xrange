@@ -46,6 +46,7 @@ PERMISSIONS = {
     "tunnels:read": "View edge tunnels",
     "analytics:read": "View zone analytics and traffic data",
     "account:read": "View plan tier and entitlements",
+    "support:write": "Open and submit support cases",
 }
 
 # Never writable, regardless of template or custom selection (per the docs).

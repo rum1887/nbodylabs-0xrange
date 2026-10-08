@@ -101,8 +101,10 @@ def _summarise(tool: str, args: dict) -> str:
     return f"{tool}({args})"
 
 
-def _before_state(tool: str, args: dict) -> dict:
+def _before_state(tool: str, args: dict | None) -> dict:
     """Capture enough state to describe/undo the change."""
+    if not isinstance(args, dict):
+        return {}
     import cf
     zone_id = args.get("zone_id")
     try:
@@ -136,35 +138,73 @@ class NBodyAgent:
         self.hierarchy = instruction_hierarchy
         self.tool_results: list[str] = []
 
-    def _undo_proposal(self):
-        changes = do_store.list_changes(self.conversation_id)
-        if not changes:
-            return None, {"error": "There are no approved changes in this conversation yet."}
-        last = changes[-1]
-        before, tool, args = last["before_state"], last["tool"], last["args"]
+    def _undo_proposal(self, target_change: dict | None = None):
+        if target_change is not None:
+            last = target_change
+        else:
+            changes = do_store.list_changes(self.conversation_id)
+            if not changes:
+                return None, {"error": "There are no approved changes in this conversation yet."}
+            last = changes[-1]
+
+        before = last.get("before_state") or {}
+        tool = last.get("tool")
+        args = last.get("args") or {}
+
         if tool == "update_dns_record" and before.get("record"):
             r = before["record"]
-            return ("update_dns_record", {"zone_id": args["zone_id"],
-                                          "record_id": args["record_id"],
-                                          "content": r["content"],
-                                          "proxied": r["proxied"]}), None
+            return "update_dns_record", {
+                "zone_id": args.get("zone_id"),
+                "record_id": args.get("record_id"),
+                "content": r.get("content"),
+                "proxied": r.get("proxied"),
+            }
         if tool == "update_zone_setting" and before.get("settings"):
-            return ("update_zone_setting", {"zone_id": args["zone_id"],
-                                            "settings": before["settings"]}), None
+            return "update_zone_setting", {
+                "zone_id": args.get("zone_id"),
+                "settings": before.get("settings"),
+            }
         if tool == "update_security_rule" and before.get("rule"):
             r = before["rule"]
-            return ("update_security_rule", {"zone_id": args["zone_id"],
-                                            "rule_id": args["rule_id"],
-                                            "enabled": r["enabled"], "action": r["action"]}), None
+            return "update_security_rule", {
+                "zone_id": args.get("zone_id"),
+                "rule_id": args.get("rule_id"),
+                "enabled": r.get("enabled"),
+                "action": r.get("action"),
+            }
         if tool == "update_cache_rule" and before.get("rule"):
             r = before["rule"]
-            return ("update_cache_rule", {"zone_id": args["zone_id"],
-                                          "rule_id": args["rule_id"],
-                                          "enabled": r["enabled"],
-                                          "expression": r["expression"]}), None
+            return "update_cache_rule", {
+                "zone_id": args.get("zone_id"),
+                "rule_id": args.get("rule_id"),
+                "enabled": r.get("enabled"),
+                "expression": r.get("expression"),
+            }
         if tool == "create_dns_record":
-            return ("delete_dns_record", {"zone_id": args["zone_id"],
-                                          "record_id": args.get("_created_id", "")}), None
+            rec_id = args.get("_created_id")
+            if not rec_id:
+                import cf
+                try:
+                    recs = cf.list_dns_records(args.get("zone_id"))["records"]
+                    matched = next((r for r in recs if r.get("name") == args.get("name") and r.get("content") == args.get("content")), None)
+                    if matched:
+                        rec_id = matched.get("id")
+                except Exception:
+                    pass
+            if rec_id:
+                return "delete_dns_record", {"zone_id": args.get("zone_id"), "record_id": rec_id}
+            return None, {"error": "Could not identify the created DNS record to delete."}
+        if tool == "delete_dns_record" and before.get("record"):
+            r = before["record"]
+            return "create_dns_record", {
+                "zone_id": args.get("zone_id"),
+                "type": r.get("type", "A"),
+                "name": r.get("name", ""),
+                "content": r.get("content", ""),
+                "proxied": r.get("proxied", False),
+            }
+        if tool == "open_support_case":
+            return None, {"error": "Support tickets cannot be undone automatically."}
         return None, {"error": f"I cannot compute an inverse for {tool}."}
 
     def respond(self, user_text: str) -> str:

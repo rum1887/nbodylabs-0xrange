@@ -199,6 +199,11 @@ def approve(proposal_id: str):
         gateway.record_tool(prop["tool"], "failed")
         return JSONResponse({"error": str(detail)}, status_code=400)
 
+    if prop["tool"] == "create_dns_record" and isinstance(result, dict):
+        rec = result.get("record") or {}
+        if rec.get("id"):
+            args["_created_id"] = rec["id"]
+
     updated = do_store.decide(proposal_id, "executed", {"result": result})
     gateway.record_tool(prop["tool"], "ok")
     do_store.record_change(prop["conversation_id"], proposal_id, prop["tool"], args,
@@ -231,9 +236,10 @@ def undo(change_id: str):
         def __init__(self):  # noqa: D107 - light shim
             self.conversation_id = change["conversation_id"]
     holder = _Holder()
-    tool, undo_args = holder._undo_proposal()
+    tool, undo_args = holder._undo_proposal(change)
     if tool is None:
-        return JSONResponse({"error": undo_args["error"]}, status_code=400)
+        err = undo_args.get("error", "Cannot undo this change") if isinstance(undo_args, dict) else str(undo_args)
+        return JSONResponse({"error": err}, status_code=400)
     prop = do_store.propose(
         change["conversation_id"], tool, undo_args,
         summary=f"Undo: {runtime._summarise(tool, undo_args)}",

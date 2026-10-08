@@ -391,7 +391,7 @@ def support():
 
 
 @app.post("/support/cases")
-def open_case(body: dict = Body(...), tok: dict = Depends(require_write("dns:write"))):
+def open_case(body: dict = Body(...), tok: dict = Depends(require_write("support:write"))):
     case = {"id": "case_" + uuid.uuid4().hex[:8], "status": "open", "at": _now(), **body}
     _audit({"event": "support_case", "case": case["id"], "token": tok["name"]})
     return case

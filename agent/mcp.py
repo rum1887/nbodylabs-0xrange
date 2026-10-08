@@ -166,7 +166,7 @@ TOOLS: dict[str, dict] = {
             zone_id, rule_id, {k: v for k, v in kw.items() if k in ("enabled", "expression")}),
     },
     "open_support_case": {
-        "kind": WRITE, "permission": "dns:write",
+        "kind": WRITE, "permission": "support:write",
         "description": "Open a support case. Requires the user to confirm.",
         "inputSchema": {"type": "object", "properties": {
             "subject": {"type": "string"}, "body": {"type": "string"},
