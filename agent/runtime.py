@@ -1,4 +1,4 @@
-"""The agent runtime — Nimbus's conversation loop.
+"""The agent runtime — NBody Agent's conversation loop.
 
 The shape mirrors the real product: the model picks a tool, we execute reads
 immediately, and *every write is converted into a proposal in the approval
@@ -29,7 +29,7 @@ INJECTION_MARKERS = (
     "instructions for ai", "system update", "override your",
 )
 
-BASE_SYSTEM = """You are Nimbus, the AI co-pilot for this account.
+BASE_SYSTEM = """You are NBody Agent, the AI co-pilot for this account.
 
 You answer questions about the customer's account using your tools, you run network
 diagnostics, and you can propose changes. You are precise and you never invent data:
@@ -131,7 +131,7 @@ def _before_state(tool: str, args: dict) -> dict:
     return {}
 
 
-class Nimbus:
+class NBodyAgent:
     """One assistant turn over one conversation."""
 
     def __init__(self, conversation_id: str, emit, instruction_hierarchy: bool = True):
@@ -242,7 +242,7 @@ class Nimbus:
             prop = do_store.propose(
                 self.conversation_id, tool, undo_args,
                 summary=f"Undo: {_summarise(tool, undo_args)}",
-                rationale="Proposed by Nimbus in response to 'undo'.",
+                rationale="Proposed by NBody Agent in response to 'undo'.",
                 before_state=_before_state(tool, undo_args),
             )
             self.emit("proposal", prop)
@@ -261,7 +261,7 @@ class Nimbus:
             prop = do_store.propose(
                 self.conversation_id, name, args,
                 summary=_summarise(name, args),
-                rationale="Proposed by Nimbus.",
+                rationale="Proposed by NBody Agent.",
                 before_state=_before_state(name, args),
             )
             self.emit("proposal", prop)

@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 ENV CF_API_URL=http://cf-mock:5000
-ENV LEE_DB=/data/lee_state.db
+ENV NBODY_DB=/data/nbody_state.db
 RUN mkdir -p /data
 EXPOSE 8080
 CMD ["python3", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -1,4 +1,4 @@
-/* Nimbus — dashboard front-end */
+/* NBody Agent — dashboard front-end */
 "use strict";
 
 const $ = (id) => document.getElementById(id);
@@ -510,7 +510,7 @@ function clampDrawer(px) {
   return Math.round(Math.max(DRAWER_MIN, Math.min(DRAWER_MAX, room, px)));
 }
 function saveDrawerPref(pref) {
-  try { localStorage.setItem("nimbus.drawer", JSON.stringify(pref)); } catch {}
+  try { localStorage.setItem("nbody.drawer", JSON.stringify(pref)); } catch {}
 }
 function setExpandIcon(on) {
   expandBtn.querySelector("use").setAttribute("href", on ? "#i-col" : "#i-exp");
@@ -629,7 +629,7 @@ const isPhone = () =>
   if (isPhone()) appEl.classList.add("drawer-hidden");
   // restore the saved drawer size
   try {
-    const pref = JSON.parse(localStorage.getItem("nimbus.drawer") || "{}");
+    const pref = JSON.parse(localStorage.getItem("nbody.drawer") || "{}");
     if (typeof pref.px === "number") setDrawerWidth(pref.px);
     else if (pref.wide) setDrawerWide(true);
   } catch {}

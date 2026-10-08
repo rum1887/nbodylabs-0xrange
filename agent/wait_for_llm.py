@@ -15,7 +15,7 @@ DEADLINE_SECONDS = 900
 
 
 def _base() -> str:
-    return (os.environ.get("LEE_OPENAI_BASE_URL") or "http://ollama:11434/v1").rstrip("/")
+    return (os.environ.get("NBODY_OPENAI_BASE_URL") or "http://ollama:11434/v1").rstrip("/")
 
 
 def _get(url: str, timeout: int = 5):
@@ -44,7 +44,7 @@ def model_ready() -> bool:
         tags = json.loads(body)
     except Exception:
         return False
-    wanted = os.environ.get("LEE_MODEL") or ""
+    wanted = os.environ.get("NBODY_MODEL") or ""
     names = [m.get("name", "") for m in tags.get("models", [])]
     if ":" in wanted:
         return any(n == wanted for n in names)      # exact tag must match
@@ -56,15 +56,15 @@ def probe_ready() -> bool:
 
 
 def wait_for(timeout: int = DEADLINE_SECONDS) -> bool:
-    print(f"[lee] waiting for LLM backend at {_base()} "
-          f"(model: {os.environ.get('LEE_MODEL', '?')})", flush=True)
+    print(f"[nbody] waiting for LLM backend at {_base()} "
+          f"(model: {os.environ.get('NBODY_MODEL', '?')})", flush=True)
     deadline = time.time() + timeout
     while time.time() < deadline:
         if probe_ready():
-            print("[lee] LLM backend + model are ready.", flush=True)
+            print("[nbody] LLM backend + model are ready.", flush=True)
             return True
         time.sleep(5)
-    print("[lee] WARNING: LLM backend not ready within the timeout.", flush=True)
+    print("[nbody] WARNING: LLM backend not ready within the timeout.", flush=True)
     return False
 
 

@@ -2,4 +2,4 @@ __pycache__/
 *.pyc
 reports/
 .env
-lee_state.db
+nbody_state.db

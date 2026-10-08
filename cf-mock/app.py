@@ -1,6 +1,6 @@
-"""Mock platform API — the account backend the Nimbus console operates on.
+"""Mock platform API — the account backend the NBody Agent console operates on.
 
-Mirrors the control plane Nimbus talks to in production:
+Mirrors the control plane NBody Agent talks to in production:
   * API tokens scoped to granted permissions (created on the user's behalf)
   * read vs write scopes, with four permanently non-writable areas
   * an account-admin "write lock" that disables all changes
@@ -57,7 +57,7 @@ def require(perm: str):
             raise HTTPException(
                 403,
                 f"This API token does not have the '{perm}' permission. "
-                "Grant it in Nimbus's access settings and retry.",
+                "Grant it in NBody Agent's access settings and retry.",
             )
         return tok
     return dep
@@ -95,7 +95,7 @@ def create_token(body: dict = Body(...)):
     secret = "cf_" + pysecrets.token_urlsafe(24)
     rec = {
         "id": "tok_" + uuid.uuid4().hex[:8],
-        "name": f"Nimbus Agent Token - {_now()[:10]}",
+        "name": f"NBody Agent Token - {_now()[:10]}",
         "scopes": scopes,
         "created": _now(),
     }
@@ -227,7 +227,7 @@ def get_account(tok: dict = Depends(require("account:read"))):
     return {k: acct.ACCOUNT[k] for k in ("id", "name", "plan", "created", "entitlements")}
 
 # ── writes (gated by token scope + admin write lock; the approval gate lives
-#    upstream in the Nimbus app, Durable-Object style) ──────────────────────
+#    upstream in the NBody Agent app, Durable-Object style) ──────────────────────
 
 @app.post("/zones/{zone_id}/dns-records")
 def create_dns(zone_id: str, body: dict = Body(...),
@@ -313,13 +313,13 @@ def update_cache_rule(zone_id: str, rule_id: str, body: dict = Body(...),
             return rule
     raise HTTPException(404, "cache rule not found")
 
-# ── areas Nimbus can NEVER write, whatever the token says ───────────
+# ── areas NBody Agent can NEVER write, whatever the token says ───────────
 
 def _never(target: str):
     def dep(tok: dict = Depends(_token)):
         _audit({"event": "denied", "target": target, "token": tok["name"]})
         raise HTTPException(
-            403, f"{target.replace('_', ' ').title()} can never be modified by Nimbus.")
+            403, f"{target.replace('_', ' ').title()} can never be modified by NBody Agent.")
     return dep
 
 

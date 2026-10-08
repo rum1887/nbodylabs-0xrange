@@ -1,4 +1,4 @@
-"""Nimbus — the account AI co-pilot (FastAPI).
+"""NBody Agent — the account AI co-pilot (FastAPI).
 
 Surfaces the product's documented behaviours:
   * account-aware answers, diagnostics, dashboard navigation, generative UI
@@ -71,13 +71,13 @@ async def lifespan(_app: FastAPI):
         permissions.load_catalogue()
         permissions.rotate_token()
     except Exception as exc:  # cf-mock may still be booting
-        print(f"[lee] initial token grant deferred: {exc}", flush=True)
+        print(f"[nbody] initial token grant deferred: {exc}", flush=True)
     threading.Thread(target=_janitor, daemon=True).start()
     threading.Thread(target=_llm_poller, daemon=True).start()
     yield
 
 
-app = FastAPI(title="Nimbus", lifespan=lifespan)
+app = FastAPI(title="NBody Agent", lifespan=lifespan)
 templates = Jinja2Templates(directory=f"{BASE_DIR}/templates")
 
 
@@ -131,9 +131,9 @@ def chat(payload: ChatIn):
 
     def worker():
         try:
-            lee = runtime.Nimbus(cid, sess.emit,
+            agent = runtime.NBodyAgent(cid, sess.emit,
                               instruction_hierarchy=payload.instruction_hierarchy)
-            lee.respond(payload.message)
+            agent.respond(payload.message)
         except Exception as exc:
             sess.emit("error", {"message": f"agent error: {exc}"})
         finally:
@@ -227,7 +227,7 @@ def undo(change_id: str):
     if not rows:
         return JSONResponse({"error": "change not found"}, status_code=404)
     change = rows[0]
-    class _Holder(runtime.Nimbus):
+    class _Holder(runtime.NBodyAgent):
         def __init__(self):  # noqa: D107 - light shim
             self.conversation_id = change["conversation_id"]
     holder = _Holder()
@@ -352,7 +352,7 @@ def export_code(payload: ExportIn):
         "expires_at": now + EXPORT_TTL_SECONDS,
         "credential": credential,
         "credential_expires_at": now + 3600,
-        "host": "exports.lee-clone.invalid",
+        "host": "exports.nbody-agent.invalid",
     }
     do_store.add_message(payload.conversation_id or "-", "system",
                          f"Exported project {payload.project_name}")
@@ -379,6 +379,6 @@ def clone_command(export_id: str):
 if __name__ == "__main__":
     import uvicorn
 
-    port = int(os.environ.get("LEE_PORT", "8080"))
-    print(f"[lee] Nimbus -> http://0.0.0.0:{port}", flush=True)
+    port = int(os.environ.get("NBODY_PORT", "8080"))
+    print(f"[nbody] NBody Agent -> http://0.0.0.0:{port}", flush=True)
     uvicorn.run(app, host="0.0.0.0", port=port)

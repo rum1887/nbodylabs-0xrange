@@ -14,7 +14,7 @@ import threading
 import uuid
 from datetime import datetime, timezone
 
-DB_PATH = os.environ.get("LEE_DB", "/data/lee_state.db")
+DB_PATH = os.environ.get("NBODY_DB", "/data/nbody_state.db")
 
 _lock = threading.RLock()
 _conn: sqlite3.Connection | None = None

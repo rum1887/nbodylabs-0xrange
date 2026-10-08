@@ -1,8 +1,8 @@
 """Tiny OpenAI-compatible LLM wrapper.
 
 Works with:
-  - Ollama   (default: LEE_OPENAI_BASE_URL=http://ollama:11434/v1)
-  - OpenAI   (LEE_OPENAI_BASE_URL=https://api.openai.com/v1 + OPENAI_API_KEY)
+  - Ollama   (default: NBODY_OPENAI_BASE_URL=http://ollama:11434/v1)
+  - OpenAI   (NBODY_OPENAI_BASE_URL=https://api.openai.com/v1 + OPENAI_API_KEY)
   - any other OpenAI-compatible server (vLLM, LM Studio, ...)
 
 Errors are retried a few times because the Ollama model may still be pulling
@@ -26,14 +26,14 @@ class LLMError(Exception):
 
 def _build_client():
     api_key = os.environ.get("OPENAI_API_KEY", "ollama")
-    base_url = (os.environ.get("LEE_OPENAI_BASE_URL") or "").strip() or None
+    base_url = (os.environ.get("NBODY_OPENAI_BASE_URL") or "").strip() or None
     if base_url:
         return OpenAI(base_url=base_url, api_key=api_key, timeout=300)
     return OpenAI(api_key=api_key, timeout=300)
 
 
 def chat(messages, tools=None, model=None, temperature=0.2, max_retries=4):
-    model = model or os.environ.get("LEE_MODEL") or "qwen3:8b"
+    model = model or os.environ.get("NBODY_MODEL") or "qwen3:8b"
     last_exc = None
     for attempt in range(max_retries):
         try:
@@ -44,7 +44,7 @@ def chat(messages, tools=None, model=None, temperature=0.2, max_retries=4):
             }
             if tools:
                 kwargs["tools"] = tools
-            base = os.environ.get("LEE_OPENAI_BASE_URL", "") or ""
+            base = os.environ.get("NBODY_OPENAI_BASE_URL", "") or ""
             if tools and model.startswith("qwen3") and ("ollama" in base or ":11434" in base):
                 # Ollama qwen3 models think by default; switch it off for this demo.
                 kwargs["extra_body"] = {"think": False}

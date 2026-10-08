@@ -1,6 +1,6 @@
-"""Client for the platform API (mock) — the account plane Nimbus operates on.
+"""Client for the platform API (mock) — the account plane NBody Agent operates on.
 
-Holds the scoped token that stands in for the API token Nimbus creates on
+Holds the scoped token that stands in for the API token NBody Agent creates on
 the user's behalf, and surfaces permission errors verbatim so the assistant can
 tell the user *why* a call failed.
 """
@@ -12,7 +12,7 @@ import requests
 
 BASE_URL = os.environ.get("CF_API_URL", "http://cf-mock:5000").rstrip("/")
 
-# Scoped token, created/rotated by permissions.py and handed to Nimbus here.
+# Scoped token, created/rotated by permissions.py and handed to NBody Agent here.
 TOKEN: str | None = None
 TOKEN_NAME: str | None = None
 
@@ -32,7 +32,7 @@ class APIError(Exception):
 
 def _headers() -> dict:
     if not TOKEN:
-        raise APIError(401, "Nimbus has no API token. Grant access first.")
+        raise APIError(401, "NBody Agent has no API token. Grant access first.")
     return {"Authorization": f"Bearer {TOKEN}"}
 
 
